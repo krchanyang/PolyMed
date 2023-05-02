@@ -22,7 +22,7 @@ repo
 [![Python 3.8](https://img.shields.io/badge/python-3.8-blue.svg)](https://www.python.org/downloads/release/python-3812/)
 
 ```shell
-conda create -n PolyMed -f environments.yaml python==3.8.5
+conda env create -n PolyMed -f environments.yaml python==3.8.5
 ```
 You must install [Deep Graph Library](https://www.dgl.ai/pages/start.html) to train Graph Models.
 ```shell

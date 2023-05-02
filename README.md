@@ -1,11 +1,8 @@
 # PolyMed: A Medical Dataset Addressing Disease Imbalance for Robust Automatic Diagnosis Systems
-[Paper(TBA)]() | [Weights(TBA)]() | [Dataset(TBA)]()
+[Paper(TBA)]() | [Weights(TBA)]() | [Dataset ![DOI: 10.5281/zenodo.7866103](https://zenodo.org/badge/DOI/10.5281/zenodo.7866103.svg)](https://doi.org/10.5281/zenodo.7866103)
 <br>
 <br>
-**PolyMed** We introduce the PolyMed dataset, designed to address the limitations of existing medical case data for Automatic Diagnosis Systems (ADS). ADS assists doctors by predicting diseases based on patients' basic information, such as age, gender, and symptoms. However, these systems face challenges due to imbalanced disease label data and difficulties in accessing or collecting medical data. To tackle these issues, the PolyMed dataset has been developed to improve the evaluation of ADS by incorporating medical knowledge graph data and diagnosis case data. The dataset aims to provide comprehensive evaluation, include diverse disease information, effectively utilize external knowledge, and perform tasks closer to real-world scenarios.
-
-We have also made the data collection tools publicly available to enable researchers and other interested parties to contribute additional data in a standardized format. These tools feature a range of customizable input fields that can be selectively utilized according to the user's specific requirements, ensuring consistency and professionalism in the data collection process.
-
+The **PolyMed** dataset has been developed to improve Automatic Diagnosis Systems (ADS) by addressing the limitations of existing medical case data. This dataset incorporates medical knowledge graph data and diagnosis case data to provide comprehensive evaluation, diverse disease information, effective utilization of external knowledge, and tasks closer to real-world scenarios. The data collection tools have been made publicly available to enable researchers and other interested parties to contribute additional data in a standardized format. 
 ## Structure
 ```
 repo
@@ -99,4 +96,3 @@ python run_test.py \
   * multi: The Multi test dataset consists of multiple diseases. This test dataset aim to measure the multiple-diseases diagnostic ability of ADS.
   * unseen: The Unseen test dataset consists of diseases not used in training process. This test dataset aim to measure the unseen diseases diagnostic ability of ADS. Especially, unseen diseases requires predicting diseases by utilizing the extenal medical knowledge(PolyMed-kg).
 ***
-

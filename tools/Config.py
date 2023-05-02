@@ -1,0 +1,17 @@
+# MLP Training Param
+EPOCH = 3000
+
+LEARNING_RATE = 0.005
+MMT = 0.94
+
+# # ResNet Param
+BLOCK_NUM = 30
+
+# # Graph MLP
+G_EMB_DIM = 64
+G_OUT_DIM = 128
+ATT_HEAD = 1
+CONCAT_SIZE = 64
+
+# # # Graph MLP v2
+KB_REFER_NUM = 5

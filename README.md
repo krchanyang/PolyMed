@@ -2,7 +2,9 @@
 [Paper(TBA)]() | [Weights(TBA)]() | [Dataset(TBA)]()
 <br>
 <br>
-**PolyMed** is ...
+**PolyMed** We introduce the PolyMed dataset, designed to address the limitations of existing medical case data for Automatic Diagnosis Systems (ADS). ADS assists doctors by predicting diseases based on patients' basic information, such as age, gender, and symptoms. However, these systems face challenges due to imbalanced disease label data and difficulties in accessing or collecting medical data. To tackle these issues, the PolyMed dataset has been developed to improve the evaluation of ADS by incorporating medical knowledge graph data and diagnosis case data. The dataset aims to provide comprehensive evaluation, include diverse disease information, effectively utilize external knowledge, and perform tasks closer to real-world scenarios.
+
+We have also made the data collection tools publicly available to enable researchers and other interested parties to contribute additional data in a standardized format. These tools feature a range of customizable input fields that can be selectively utilized according to the user's specific requirements, ensuring consistency and professionalism in the data collection process.
 
 ## Structure
 ```

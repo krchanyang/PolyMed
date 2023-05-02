@@ -52,7 +52,7 @@ class MLTrainingRunner:
         lda.fit(self.train_x, self.train_y)
         joblib.dump(lda, os.path.join(model_save_path, "lda.pkl"))
 
-        xgboost = XGBClassifier(seed=self.seed)
+        xgboost = XGBClassifier(seed=self.seed, use_label_encoder=False)
         xgboost.fit(self.train_x, self.train_y, sample_weight=sample_weights)
         joblib.dump(xgboost, os.path.join(model_save_path, "xgboost.pkl"))
 

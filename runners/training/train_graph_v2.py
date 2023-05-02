@@ -1,0 +1,185 @@
+import torch
+from torch import nn
+from tools.Config import (
+    G_EMB_DIM,
+    G_OUT_DIM,
+    ATT_HEAD,
+    KB_REFER_NUM,
+    CONCAT_SIZE,
+    EPOCH,
+)
+from models.Knowledge_models import GATv2, Knowledge_search, KnowledgeMLP_v2
+import tqdm
+from collections import defaultdict
+import itertools
+from utils.metrics import recall_k, precision_k, f1_k, ndcg_k
+import json
+import os
+
+
+def init_weights(m):
+    if isinstance(m, nn.Linear):
+        torch.nn.init.xavier_uniform_(m.weight)
+        m.bias.data.fill_(0.01)
+
+
+class GraphV2TrainingRunner:
+    def __init__(
+        self,
+        train_x,
+        train_y,
+        test_x,
+        test_y,
+        word_idx_case,
+        org_kb_data,
+        word_idx_total,
+        idx_word_total,
+        word_idx_kb,
+        word_idx_allkb,
+        graph,
+        args,
+        device,
+    ):
+        self.device = device
+        self.train_x = train_x
+        self.train_y = train_y
+        self.test_x = test_x
+        self.test_y = test_y
+
+        self.word_idx_case = (
+            word_idx_case  # polymed.data_variable.word_idx_case['diagnosis']
+        )
+        self.org_kb_data = org_kb_data  # polymed.org_kb_data
+        self.word_idx_total = word_idx_total  # polymed.data_variable.word_idx_total
+        self.idx_word_total = idx_word_total  # polymed.data_variable.idx_word_total
+        self.word_idx_kb = word_idx_kb  # polymed.data_variable.word_idx_kb
+        self.word_idx_allkb = word_idx_allkb  # polymed.data_variable.word_idx_allkb
+        self.graph = graph  # Training_data().graph
+
+        self.k = args.k
+        self.save_base_path = os.path.join(args.save_base_path, args.train_data_type)
+
+    def train(self):
+        print("Graph MLP v2 Training start...")
+        model_save_path = os.path.join(self.save_base_path, "Graph_v2")
+        os.makedirs(model_save_path, exist_ok=True)
+
+        gat_input_feats = G_EMB_DIM
+        gat_output_feats = G_OUT_DIM
+        num_heads = ATT_HEAD
+        knowledge_k = KB_REFER_NUM
+        concat_size = CONCAT_SIZE
+
+        dc_input = len(self.train_x[0])
+        dc_output = len(self.word_idx_case)
+
+        train_x = torch.tensor(self.train_x).type(torch.FloatTensor).to(self.device)
+        train_y = torch.tensor(self.train_y).type(torch.LongTensor).to(self.device)
+        test_x = torch.tensor(self.test_x).type(torch.FloatTensor).to(self.device)
+
+        kbsearch = Knowledge_search(
+            self.org_kb_data, self.word_idx_total, self.idx_word_total
+        )
+        search_list = kbsearch.cos_sim_search(
+            self.train_x, self.idx_word_total, self.word_idx_allkb, knowledge_k
+        )
+
+        test_search_list = kbsearch.cos_sim_search(
+            self.test_x, self.idx_word_total, self.word_idx_allkb, knowledge_k
+        )
+
+        graph = self.graph.to(self.device)
+
+        kg_mlp = KnowledgeMLP_v2(
+            input_size=dc_input,
+            output_size=dc_output,
+            kg_size=gat_output_feats,
+            concat_size=concat_size,
+        )
+        # kg_mlp.apply(self.init_weights)
+        kg_mlp.to(self.device)
+        # kg_mlp = kg_mlp.to(self.device)
+
+        node_embed = nn.Embedding(graph.number_of_nodes(), gat_input_feats)
+        inputs = node_embed.weight
+        nn.init.xavier_uniform_(inputs)
+        inputs = inputs.to(self.device)
+
+        gat_net = GATv2(gat_input_feats, gat_output_feats, num_heads)
+        gat_net.to(self.device)
+        criterion = nn.CrossEntropyLoss()
+        optimizer = torch.optim.Adam(
+            itertools.chain(
+                gat_net.parameters(), node_embed.parameters(), kg_mlp.parameters()
+            ),
+            lr=0.01,
+        )
+
+        train_history = defaultdict(list)
+        test_history = defaultdict(list)
+        best_result = defaultdict(dict)
+
+        prev_test_recall_1 = 1e-4
+
+        for t in tqdm.tqdm(range(EPOCH)):
+            # Train
+            kg_mlp.train()
+            gat_net.train()
+
+            optimizer.zero_grad()
+            graph_emb = gat_net(graph, inputs)
+
+            y_pred = kg_mlp(train_x, graph_emb, search_list)
+
+            loss = criterion(y_pred, train_y)
+
+            loss.backward(retain_graph=True)
+
+            optimizer.step()
+
+            train_history["train_loss"].append(loss.item())
+
+            # Test
+            kg_mlp.eval()
+            gat_net.eval()
+            with torch.no_grad():
+                test_pred = kg_mlp(test_x, graph_emb, test_search_list)
+                test_pred = test_pred.cpu().detach().numpy()
+
+            for k in self.k:
+                test_history[f"recall_{k}"].append(recall_k(test_pred, self.test_y, k))
+                test_history[f"precision_{k}"].append(
+                    precision_k(test_pred, self.test_y, k)
+                )
+                test_history[f"f1_{k}"].append(f1_k(test_pred, self.test_y, k))
+                test_history[f"ndcg_{k}"].append(ndcg_k(test_pred, self.test_y, k))
+
+            test_recall_1 = recall_k(test_pred, self.test_y, 1)
+
+            if prev_test_recall_1 < test_recall_1:
+                prev_test_recall_1 = test_recall_1
+
+                best_result["epoch"] = t + 1
+                best_result["train_loss"] = train_history["train_loss"][-1]
+                for k in self.k:
+                    best_result[f"recall_{k}"] = test_history[f"recall_{k}"][-1]
+                    best_result[f"precision_{k}"] = test_history[f"precision_{k}"][-1]
+                    best_result[f"f1_{k}"] = test_history[f"f1_{k}"][-1]
+                    best_result[f"ndcg_{k}"] = test_history[f"ndcg_{k}"][-1]
+                torch.save(
+                    {
+                        "gatv2": gat_net.state_dict(),
+                        "kg_mlp": kg_mlp.state_dict(),
+                        "emb": node_embed.weight,
+                        "optimizer": optimizer.state_dict(),
+                    },
+                    os.path.join(model_save_path, "knowledge_mlp_v2.pt"),
+                )
+
+                with open(
+                    os.path.join(model_save_path, "best_results.json"),
+                    "w",
+                    encoding="utf-8",
+                ) as json_file:
+                    json.dump(best_result, json_file, indent="\t")
+        print("Graph MLP v2 Training done and Save the best params...")

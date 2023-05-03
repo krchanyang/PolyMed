@@ -24,12 +24,12 @@ NORM_TUNED_ML_MODEL_SAVE_PATH = "./experiments/norm/ML/tuned/*.pkl"
 
 NORM_MLP_MODEL_SAVE_PATH = "./experiments/norm/MLP"
 EXTEND_MLP_MODEL_SAVE_PATH = "./experiments/extend/MLP"
-KB_EXTEND_MLP_MODEL_SAVE_PATH = "./experiments/norm/MLP"
+KB_EXTEND_MLP_MODEL_SAVE_PATH = "./experiments/kb_extend/MLP"
 MLP_SAVED_MODEL_NAME = "simple_mlp.pt"
 
 NORM_RESNET_MODEL_SAVE_PATH = "./experiments/norm/ResNet"
 EXTEND_RESNET_MODEL_SAVE_PATH = "./experiments/extend/ResNet"
-KB_EXTEND_RESNET_MODEL_SAVE_PATH = "./experiments/norm/ResNet"
+KB_EXTEND_RESNET_MODEL_SAVE_PATH = "./experiments/kb_extend/ResNet"
 RESNET_SAVED_MODEL_NAME = "resnet_mlp.pt"
 
 EXTEND_GRAPH_V1_MODEL_SAVE_PATH = "./experiments/extend/Graph_v1"

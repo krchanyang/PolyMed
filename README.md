@@ -18,19 +18,20 @@ repo
 ```
 ***
 
-## Anaconda Enironment
+## Anaconda Environment
 [![Python 3.8](https://img.shields.io/badge/python-3.8-blue.svg)](https://www.python.org/downloads/release/python-3812/)
 
+1. Create Anaconda Env
 ```shell
-conda env create -n PolyMed -f environments.yaml python==3.8.5
+conda env -n PolyMed python==3.8.5
 ```
-You must install [Deep Graph Library](https://www.dgl.ai/pages/start.html) to train Graph Models.
-```shell
-pip install dgl -f https://data.dgl.ai/wheels/cu118/repo.html
-pip install dglgo -f https://data.dgl.ai/wheels-test/repo.html
-```
+2. Activate Created Env
 ```shell
 conda activate PolyMed
+```
+3. Install Requirements (CUDA: 11.8)
+```shell
+pip install -r requirements.txt
 ```
 
 ***

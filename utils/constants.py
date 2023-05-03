@@ -33,9 +33,9 @@ KB_EXTEND_RESNET_MODEL_SAVE_PATH = "./experiments/norm/ResNet"
 RESNET_SAVED_MODEL_NAME = "resnet_mlp.pt"
 
 EXTEND_GRAPH_V1_MODEL_SAVE_PATH = "./experiments/extend/Graph_v1"
-KB_EXTEND_GRAPH_V1_MODEL_SAVE_PATH = "./experiments/norm/Graph_v1"
+KB_EXTEND_GRAPH_V1_MODEL_SAVE_PATH = "./experiments/kb_extend/Graph_v1"
 GRAPH_V1_SAVED_MODEL_NAME = "knowledge_mlp_v1.pt"
 
 EXTEND_GRAPH_V2_MODEL_SAVE_PATH = "./experiments/extend/Graph_v2"
-KB_EXTEND_GRAPH_V2_MODEL_SAVE_PATH = "./experiments/norm/Graph_v2"
+KB_EXTEND_GRAPH_V2_MODEL_SAVE_PATH = "./experiments/kb_extend/Graph_v2"
 GRAPH_V2_SAVED_MODEL_NAME = "knowledge_mlp_v2.pt"

@@ -13,7 +13,7 @@ import argparse
 
 def main(args):
     os.makedirs("./experiments", exist_ok=True)
-    os.environ["CUDA_VISIBLE_DEVICES"] = args.device
+    os.environ["CUDA_VISIBLE_DEVICES"] = str(args.device)
     seed_everything(args.seed)
     device = "cuda" if torch.cuda.is_available() else "cpu"
 

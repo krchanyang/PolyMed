@@ -5,12 +5,23 @@
 .idea/
 .DS_Store
 data/
+<<<<<<< HEAD
 experiments/
 models/__pycache__
 runners/training/__pycache__
 tools/__pycache__
 utils/__pycache__
 catboost_info/
+=======
+catboost_info/
+experiments/
+models/__pycache__
+runners/training/__pycache__
+runners/testing/__pycache__
+runners/tuning/__pycache__
+tools/__pycache__
+utils/__pycache__
+>>>>>>> 2318c0549a4813de67f281baa551368485d09d53
 
 ### PyCharm ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider

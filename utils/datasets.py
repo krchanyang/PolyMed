@@ -11,12 +11,14 @@ class PolymedDataset:
         test_data_type: Optional[str],
         model_name: str,
         is_tuning: bool = False,
+        is_training: bool = True,
     ):
         self.polymed = polymed
         self.train_data_type = train_data_type
         self.test_data_type = test_data_type
         self.model_name = model_name
         self.is_tuning = is_tuning
+        self.is_training = is_training
 
     def load_train_data(self):
         train_data = Training_data(self.polymed, "train")
@@ -29,7 +31,11 @@ class PolymedDataset:
             train_x = train_data.kb_train_x
             train_y = train_data.kb_train_y
 
-        if not self.is_tuning and "graph" in self.model_name.lower():
+        if (
+            self.is_tuning is False
+            and self.is_training is True
+            and "graph" in self.model_name.lower()
+        ):
             graph = train_data.graph
             return train_x, train_y, graph
 
@@ -62,7 +68,11 @@ class PolymedDataset:
                 test_x = test_data.kb_unseen_test_x
                 test_y = test_data.kb_unseen_test_y
 
-        if not self.is_tuning and "graph" in self.model_name.lower():
+        if (
+            self.is_tuning is False
+            and self.is_training is False
+            and "graph" in self.model_name.lower()
+        ):
             graph = test_data.graph
             return test_x, test_x, graph
         return test_x, test_y

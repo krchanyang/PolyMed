@@ -1,6 +1,6 @@
 import torch
 from torch import nn
-from tools.Config import BLOCK_NUM, LEARNING_RATE, MMT, EPOCH 
+from tools.Config import BLOCK_NUM, LEARNING_RATE, MMT, EPOCH
 from models.MLP_models import Linear_resnet
 import tqdm
 from collections import defaultdict
@@ -10,9 +10,7 @@ import os
 
 
 class MLPResNetTrainingRunner:
-    def __init__(
-        self, train_x, train_y, test_x, test_y, word_idx_case, args, device
-    ):
+    def __init__(self, train_x, train_y, test_x, test_y, word_idx_case, args, device):
         self.device = device
         self.train_x = train_x
         self.train_y = train_y

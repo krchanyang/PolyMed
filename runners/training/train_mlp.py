@@ -10,9 +10,7 @@ import os
 
 
 class MLPTrainingRunner:
-    def __init__(
-        self, train_x, train_y, test_x, test_y, word_idx_case, args, device
-    ):
+    def __init__(self, train_x, train_y, test_x, test_y, word_idx_case, args, device):
         self.device = device
         self.train_x = train_x
         self.train_y = train_y

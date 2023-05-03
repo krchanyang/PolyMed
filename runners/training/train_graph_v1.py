@@ -28,7 +28,7 @@ class GraphV1TrainingRunner:
         word_idx_kb,
         graph,
         args,
-        device
+        device,
     ):
         self.device = device
         self.train_x = train_x

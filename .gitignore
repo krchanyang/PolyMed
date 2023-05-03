@@ -10,6 +10,7 @@ models/__pycache__
 runners/training/__pycache__
 tools/__pycache__
 utils/__pycache__
+catboost_info/
 
 ### PyCharm ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider

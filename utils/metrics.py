@@ -37,17 +37,19 @@ def f1_k(proba, ground, k):
 
 
 def dcg(rel, i):
-    return rel / np.log2(i+1)
+    return rel / np.log2(i + 1)
+
 
 def idcg(rel, data_length):
     accum_idcg = 0
-    for i in range(1, data_length+1):
+    for i in range(1, data_length + 1):
         accum_idcg += dcg(rel, i)
     return accum_idcg
 
+
 def ndcg_k(proba, ground, k):
     ndcg_result = []
-    target_score = 5 # Suppose all relevance are same(Figures do not affect results)
+    target_score = 5  # Suppose all relevance are same(Figures do not affect results)
 
     top_k = np.flip(np.argsort(proba), axis=1)[:, :k]
     for y_h, y in zip(top_k, ground):

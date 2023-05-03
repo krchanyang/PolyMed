@@ -10,7 +10,7 @@ ML_MODEL_DICT = {
     "knn": "KNeighborsClassifier",
     "nb": "GaussianNB",
     "adaboost": "AdaBoostClassifier",
-    "lgbm": "LGBMClassifier"
+    "lgbm": "LGBMClassifier",
 }
 
 

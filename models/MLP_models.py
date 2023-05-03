@@ -15,7 +15,7 @@ class Disease_classifier(nn.Module):
             nn.ReLU(),
             nn.Linear(512, 128),
             nn.ReLU(),
-            nn.Linear(128, output_size)
+            nn.Linear(128, output_size),
         )
 
     def forward(self, x):
@@ -31,7 +31,7 @@ class Residual_block(nn.Module):
             nn.BatchNorm1d(512),
             nn.ReLU(),
             nn.Linear(512, output_size),
-            nn.BatchNorm1d(output_size)
+            nn.BatchNorm1d(output_size),
         )
 
     def forward(self, x):
@@ -46,9 +46,7 @@ class Linear_resnet(nn.Module):
         super().__init__()
         self.residual_block = nn.ModuleList()
         self.initial_layer = torch.nn.Sequential(
-            nn.Linear(input_size, output_size),
-            nn.BatchNorm1d(output_size),
-            nn.ReLU()
+            nn.Linear(input_size, output_size), nn.BatchNorm1d(output_size), nn.ReLU()
         )
         for block in range(block_num):
             self.residual_block.append(Residual_block(output_size, output_size))

@@ -1,6 +1,13 @@
 import torch
 from torch import nn
-from tools.Config import G_EMB_DIM, G_OUT_DIM, ATT_HEAD, KB_REFER_NUM, CONCAT_SIZE, EPOCH
+from tools.Config import (
+    G_EMB_DIM,
+    G_OUT_DIM,
+    ATT_HEAD,
+    KB_REFER_NUM,
+    CONCAT_SIZE,
+    EPOCH,
+)
 from models.Knowledge_models import GATv2, Knowledge_search, KnowledgeMLP_v2
 import tqdm
 from collections import defaultdict
@@ -31,7 +38,7 @@ class GraphV2TrainingRunner:
         word_idx_allkb,
         graph,
         args,
-        device
+        device,
     ):
         self.device = device
         self.train_x = train_x
@@ -48,7 +55,7 @@ class GraphV2TrainingRunner:
         self.word_idx_kb = word_idx_kb  # polymed.data_variable.word_idx_kb
         self.word_idx_allkb = word_idx_allkb  # polymed.data_variable.word_idx_allkb
         self.graph = graph  # Training_data().graph
-        
+
         self.k = args.k
         self.save_base_path = os.path.join(args.save_base_path, args.train_data_type)
 
@@ -131,7 +138,7 @@ class GraphV2TrainingRunner:
             optimizer.step()
 
             train_history["train_loss"].append(loss.item())
-            
+
             # Test
             kg_mlp.eval()
             gat_net.eval()

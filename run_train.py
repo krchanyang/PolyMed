@@ -13,7 +13,9 @@ import argparse
 
 def main(args):
     os.makedirs("./experiments", exist_ok=True)
+    os.environ["CUDA_VISIBLE_DEVICES"] = args.device
     seed_everything(args.seed)
+    device = "cuda" if torch.cuda.is_available() else "cpu"
 
     polymed = PolyMed(
         args.data_dir,
@@ -42,8 +44,6 @@ def main(args):
     else:
         train_x, train_y = dataset.load_train_data()
     test_x, test_y = dataset.load_test_data()
-
-    device = f"cuda:{args.device}" if torch.cuda.is_available() else "cpu"
 
     if args.model_name.lower() == "ml":
         training_runner = MLTrainingRunner(train_x, train_y, args, device)

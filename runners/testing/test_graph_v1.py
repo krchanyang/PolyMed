@@ -21,7 +21,7 @@ class GraphV1TestingRunner:
         org_kb_data,
         word_idx_total,
         idx_word_total,
-        word_idx_kb,
+        word_idx_allkb,
         graph,
         args,
         device,
@@ -36,7 +36,7 @@ class GraphV1TestingRunner:
         self.org_kb_data = org_kb_data  # polymed.org_kb_data
         self.word_idx_total = word_idx_total  # polymed.data_variable.word_idx_total
         self.idx_word_total = idx_word_total  # polymed.data_variable.idx_word_total
-        self.word_idx_kb = word_idx_kb  # polymed.data_variable.word_idx_kb
+        self.word_idx_allkb = word_idx_allkb  # polymed.data_variable.word_idx_kb
         self.graph = graph  # Training_data().graph
         self.train_data_type = args.train_data_type
         self.test_data_type = args.test_data_type
@@ -75,12 +75,11 @@ class GraphV1TestingRunner:
             self.org_kb_data, self.word_idx_total, self.idx_word_total
         )
         search_list = kbsearch.knowledge_sym_search(
-            self.test_x, self.idx_word_total, self.word_idx_kb
+            self.test_x, self.idx_word_total, self.word_idx_allkb
         )
 
-        graph = self.graph.to(self.device)
-
         params = torch.load(model_saved_path)
+        graph = params['graph']
 
         kg_mlp = KnowledgeMLP_v1(
             input_size=dc_input,
@@ -97,6 +96,7 @@ class GraphV1TestingRunner:
         gat_net = GATv2(gat_input_feats, gat_output_feats, num_heads)
         gat_net.load_state_dict(params["gatv2"])
         gat_net = gat_net.to(self.device)
+
 
         test_result = defaultdict(list)
 

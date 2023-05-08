@@ -15,6 +15,8 @@ import itertools
 from utils.metrics import recall_k, precision_k, f1_k, ndcg_k
 import json
 import os
+import numpy as np
+from utils.compute_weights import compute_class_weights
 
 
 def init_weights(m):
@@ -88,6 +90,16 @@ class GraphV2TrainingRunner:
             self.test_x, self.idx_word_total, self.word_idx_allkb, knowledge_k
         )
 
+        class_weight = compute_class_weights(self.train_y)
+        class_weight_list = []
+        for idx, (k, v) in enumerate(class_weight.items()):
+            if idx == k:
+                class_weight_list.append(v)
+            else:
+                raise Exception('The order of labels in class weight is broken, check the weight dictionary')
+
+        class_weight_list = torch.tensor(np.array(class_weight_list)).type(torch.FloatTensor).to(self.device)
+
         graph = self.graph.to(self.device)
 
         kg_mlp = KnowledgeMLP_v2(
@@ -107,7 +119,7 @@ class GraphV2TrainingRunner:
 
         gat_net = GATv2(gat_input_feats, gat_output_feats, num_heads)
         gat_net.to(self.device)
-        criterion = nn.CrossEntropyLoss()
+        criterion = nn.CrossEntropyLoss(weight=class_weight_list)
         optimizer = torch.optim.Adam(
             itertools.chain(
                 gat_net.parameters(), node_embed.parameters(), kg_mlp.parameters()
@@ -170,7 +182,8 @@ class GraphV2TrainingRunner:
                     {
                         "gatv2": gat_net.state_dict(),
                         "kg_mlp": kg_mlp.state_dict(),
-                        "emb": node_embed.weight,
+                        "emb": inputs,
+                        "graph": graph,
                         "optimizer": optimizer.state_dict(),
                     },
                     os.path.join(model_save_path, "knowledge_mlp_v2.pt"),
@@ -182,4 +195,13 @@ class GraphV2TrainingRunner:
                     encoding="utf-8",
                 ) as json_file:
                     json.dump(best_result, json_file, indent="\t")
+
+            if t % 100 == 0:
+                print("\n", "=" * 5, "Traning check", "=" * 5)
+                print("Recall@1: ", test_history["recall_1"][-1])
+                print("Recall@3: ", test_history["recall_3"][-1])
+                print("Recall@5: ", test_history["recall_5"][-1])
+                print("Loss: ", loss.item())
+                print("=" * 23)
+
         print("Graph MLP v2 Training done and Save the best params...")

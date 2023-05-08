@@ -9,13 +9,15 @@ from utils.fix_seed import seed_everything
 import torch
 import os
 import argparse
+from utils.translation import str2bool
 
 
 def main(args):
-    os.makedirs("./experiments", exist_ok=True)
     os.environ["CUDA_VISIBLE_DEVICES"] = str(args.device)
+    os.makedirs("./experiments", exist_ok=True)
     seed_everything(args.seed)
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    device = f"cuda" if torch.cuda.is_available() else "cpu"
 
     polymed = PolyMed(
         args.data_dir,
@@ -44,6 +46,8 @@ def main(args):
     else:
         train_x, train_y = dataset.load_train_data()
     test_x, test_y = dataset.load_test_data()
+
+    print(f"train_x shape: {train_x.shape} | train_y.shape: {train_y.shape}")
 
     if args.model_name.lower() == "ml":
         training_runner = MLTrainingRunner(train_x, train_y, args, device)
@@ -159,6 +163,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "--seed", type=int, default=42, help="Set random state. Default is 42."
     )
+    parser.add_argument("--class_weights", type=str2bool, default="False")
+
     args = parser.parse_args()
 
     main(args)

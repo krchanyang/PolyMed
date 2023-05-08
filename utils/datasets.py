@@ -28,6 +28,8 @@ class PolymedDataset:
             train_y = train_data.train_y
 
         if self.train_data_type == "kb_extend":
+            print("KB_Extend Train Data Loaded.")
+
             train_x = train_data.kb_train_x
             train_y = train_data.kb_train_y
 
@@ -49,6 +51,8 @@ class PolymedDataset:
                 test_x = test_data.single_test_x
                 test_y = test_data.single_test_y
             if self.train_data_type == "kb_extend":
+                print("Single KB_Extend Test Data Loaded.")
+
                 test_x = test_data.kb_single_test_x
                 test_y = test_data.kb_single_test_y
 
@@ -74,5 +78,5 @@ class PolymedDataset:
             and "graph" in self.model_name.lower()
         ):
             graph = test_data.graph
-            return test_x, test_x, graph
+            return test_x, test_y, graph
         return test_x, test_y

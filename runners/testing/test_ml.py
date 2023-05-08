@@ -13,6 +13,7 @@ from utils.constants import (
     KB_EXTEND_ML_MODEL_SAVE_PATH,
     EXTEND_TUNED_ML_MODEL_SAVE_PATH,
     KB_EXTEND_TUNED_ML_MODEL_SAVE_PATH,
+    KB_EXTEND_CLASS_WEIGHTS_ML_MODEL_SAVE_PATH,
     NORM_ML_MODEL_SAVE_PATH,
     NORM_TUNED_ML_MODEL_SAVE_PATH,
 )
@@ -25,6 +26,7 @@ class MLTestingRunner:
         self.k = args.k
         self.train_data_type = args.train_data_type
         self.test_data_type = args.test_data_type
+        self.class_weights = args.class_weights
         self.device = device
 
     def test_ml_baseline(self):
@@ -44,9 +46,24 @@ class MLTestingRunner:
             csv_save_path = os.path.join(
                 EXTEND_ML_MODEL_SAVE_PATH.split("*")[0], csv_save_name
             )
+        if self.train_data_type == "kb_extend":
+            if self.class_weights:
+                ml_model_paths = sorted(
+                    glob(KB_EXTEND_CLASS_WEIGHTS_ML_MODEL_SAVE_PATH)
+                )
+                csv_save_path = os.path.join(
+                    KB_EXTEND_CLASS_WEIGHTS_ML_MODEL_SAVE_PATH.split("*")[0],
+                    csv_save_name,
+                )
+            else:
+                ml_model_paths = sorted(glob(KB_EXTEND_ML_MODEL_SAVE_PATH))
+                csv_save_path = os.path.join(
+                    KB_EXTEND_ML_MODEL_SAVE_PATH.split("*")[0], csv_save_name
+                )
 
         for path in ml_model_paths:
-            name = path.split("/")[-1].split(".pkl")[0]
+            print(path)
+            name = path.split("/")[-1].split(".pkl")[0].split("_")[0]
             model_name = ML_MODEL_DICT[name]
             results["model"].append(model_name)
 
@@ -66,9 +83,9 @@ class MLTestingRunner:
                 results[f"f1_{k}"].append(f1_k(pred_proba, self.test_y, k))
                 results[f"ndcg_{k}"].append(ndcg_k(pred_proba, self.test_y, k))
 
-        print(result_dataframe)
         result_dataframe = pd.DataFrame(results)
         result_dataframe.to_csv(csv_save_path, index=False)
+        print(result_dataframe)
 
     def test_ml_tuned(self):
         results = defaultdict(list)
@@ -87,15 +104,33 @@ class MLTestingRunner:
             csv_save_path = os.path.join(
                 EXTEND_TUNED_ML_MODEL_SAVE_PATH.split("*")[0], csv_save_name
             )
+        if self.train_data_type == "kb_extend":
+            if self.class_weights:
+                ml_model_paths = sorted(
+                    glob(KB_EXTEND_CLASS_WEIGHTS_ML_MODEL_SAVE_PATH)
+                )
+                csv_save_path = os.path.join(
+                    KB_EXTEND_CLASS_WEIGHTS_ML_MODEL_SAVE_PATH.split("*")[0],
+                    csv_save_name,
+                )
+            else:
+                ml_model_paths = sorted(glob(KB_EXTEND_TUNED_ML_MODEL_SAVE_PATH))
+                csv_save_path = os.path.join(
+                    KB_EXTEND_TUNED_ML_MODEL_SAVE_PATH.split("*")[0], csv_save_name
+                )
 
         for path in ml_model_paths:
-            name = path.split("/")[-1].split(".pkl")[0]
+            print(f"path: {path}")
+            name = path.split("/")[-1].split(".pkl")[0].split("_")[0]
+            print(f"name: {name}")
             model_name = ML_MODEL_DICT[name]
             results["model"].append(model_name)
 
             if "cat" in name:
                 trained_model = CatBoostClassifier()
                 trained_model.load_model(path)
+                trained_model = joblib.load(path)
+
             else:
                 trained_model = joblib.load(path)
 
@@ -109,6 +144,6 @@ class MLTestingRunner:
                 results[f"f1_{k}"].append(f1_k(pred_proba, self.test_y, k))
                 results[f"ndcg_{k}"].append(ndcg_k(pred_proba, self.test_y, k))
 
-        print(result_dataframe)
         result_dataframe = pd.DataFrame(results)
         result_dataframe.to_csv(csv_save_path, index=False)
+        print(result_dataframe)

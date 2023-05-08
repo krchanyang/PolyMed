@@ -113,10 +113,11 @@ python run_test.py \
 
 ### Testing Guides
 Just additionally specify the type of test data following the training guides (e.g. --test_data_type "unseen" → --test_data_type "multi")
+
 ***
-## Experiment Environment
-- CPU: AMD Ryzen Threadripper PRO 5995WX (64 Cores, 128 Threads)
-- GPU: RTX 4090 24GB
+### Experiment Environment
+- CPU: AMD Ryzen Threadripper PRO 5995WX (64 cores, 128 threads)
+- GPU: RTX 4090 1EA
 - RAM: 256GB
 - OS: Ubuntu 20.04.6 LTS
 - CUDA: 11.8

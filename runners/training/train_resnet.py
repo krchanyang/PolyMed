@@ -7,6 +7,8 @@ from collections import defaultdict
 from utils.metrics import recall_k, precision_k, f1_k, ndcg_k
 import json
 import os
+from utils.compute_weights import compute_class_weights_torch
+import numpy as np
 
 
 class MLPResNetTrainingRunner:
@@ -17,6 +19,7 @@ class MLPResNetTrainingRunner:
         self.test_x = test_x
         self.test_y = test_y
         self.word_idx_case = word_idx_case
+        self.class_weights = args.class_weights
         self.k = args.k
         self.save_base_path = os.path.join(args.save_base_path, args.train_data_type)
 
@@ -30,6 +33,14 @@ class MLPResNetTrainingRunner:
         test_x = torch.tensor(self.test_x).type(torch.FloatTensor).to(self.device)
         test_y = self.test_y
 
+        criterion = nn.CrossEntropyLoss()
+
+        if self.class_weights:
+            class_weight_list = compute_class_weights_torch(self.train_y).to(
+                self.device
+            )
+            criterion = nn.CrossEntropyLoss(weight=class_weight_list)
+
         resnet_mlp = Linear_resnet(
             input_size=len(train_x[0]),
             output_size=len(self.word_idx_case),
@@ -37,7 +48,6 @@ class MLPResNetTrainingRunner:
         )
         resnet_mlp = resnet_mlp.to(self.device)
 
-        criterion = nn.CrossEntropyLoss()
         optimizer = torch.optim.SGD(
             resnet_mlp.parameters(), lr=LEARNING_RATE, momentum=MMT
         )

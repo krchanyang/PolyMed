@@ -1,10 +1,10 @@
 from tools.PolyMed import PolyMed
-from runners.training.train_ml import MLTrainingRunner
-from runners.training.train_mlp import MLPTrainingRunner
-from runners.training.train_resnet import MLPResNetTrainingRunner
-from runners.training.train_graph_v1 import GraphV1TrainingRunner
-from runners.training.train_graph_v2 import GraphV2TrainingRunner
 from utils.datasets import PolymedDataset
+from runners.testing.test_ml import MLTestingRunner
+from runners.testing.test_mlp import MLPTestingRunner
+from runners.testing.test_resnet import MLPResNetTestingRunner
+from runners.testing.test_graph_v1 import GraphV1TestingRunner
+from runners.testing.test_graph_v2 import GraphV2TestingRunner
 from utils.fix_seed import seed_everything
 import torch
 import os
@@ -13,11 +13,9 @@ from utils.translation import str2bool
 
 
 def main(args):
-    os.environ["CUDA_VISIBLE_DEVICES"] = str(args.device)
-    os.makedirs("./experiments", exist_ok=True)
     seed_everything(args.seed)
-
-    device = f"cuda" if torch.cuda.is_available() else "cpu"
+    os.environ["CUDA_VISIBLE_DEVICES"] = str(args.device)
+    device = "cuda" if torch.cuda.is_available() else "cpu"
 
     polymed = PolyMed(
         args.data_dir,
@@ -27,7 +25,6 @@ def main(args):
         args.plotting,
         args.integrity,
     )
-
     word_idx_case = polymed.data_variable.word_idx_case["diagnosis"]
     org_kb_data = polymed.org_kb_data
     word_idx_total = polymed.data_variable.word_idx_total
@@ -38,31 +35,34 @@ def main(args):
     dataset = PolymedDataset(
         polymed=polymed,
         train_data_type=args.train_data_type,
-        test_data_type=None,
+        test_data_type=args.test_data_type,
         model_name=args.model_name,
+        is_tuning=False,
+        is_training=False,
     )
+
     if "graph" in args.model_name.lower():
-        train_x, train_y, graph = dataset.load_train_data()
+        test_x, test_y, graph = dataset.load_test_data()
     else:
-        train_x, train_y = dataset.load_train_data()
-    test_x, test_y = dataset.load_test_data()
+        test_x, test_y = dataset.load_test_data()
 
-    print(f"train_x shape: {train_x.shape} | train_y.shape: {train_y.shape}")
+    if "ml" in args.model_name.lower():
+        testing_runner = MLTestingRunner(test_x, test_y, args, device)
+        if "baseline" in args.model_name.lower():
+            testing_runner.test_ml_baseline()
+        if "tuned" in args.model_name.lower():
+            testing_runner.test_ml_tuned()
 
-    if args.model_name.lower() == "ml":
-        training_runner = MLTrainingRunner(train_x, train_y, args, device)
     if args.model_name.lower() == "mlp":
-        training_runner = MLPTrainingRunner(
-            train_x, train_y, test_x, test_y, word_idx_case, args, device
-        )
+        testing_runner = MLPTestingRunner(test_x, test_y, word_idx_case, args, device)
+        testing_runner.test_mlp()
     if args.model_name.lower() == "res":
-        training_runner = MLPResNetTrainingRunner(
-            train_x, train_y, test_x, test_y, word_idx_case, args, device
+        testing_runner = MLPResNetTestingRunner(
+            test_x, test_y, word_idx_case, args, device
         )
+        testing_runner.test_resnet()
     if args.model_name.lower() == "graphv1":
-        training_runner = GraphV1TrainingRunner(
-            train_x,
-            train_y,
+        testing_runner = GraphV1TestingRunner(
             test_x,
             test_y,
             word_idx_case,
@@ -74,10 +74,9 @@ def main(args):
             args,
             device,
         )
+        testing_runner.test_graph_mlp_v1()
     if args.model_name.lower() == "graphv2":
-        training_runner = GraphV2TrainingRunner(
-            train_x,
-            train_y,
+        testing_runner = GraphV2TestingRunner(
             test_x,
             test_y,
             word_idx_case,
@@ -90,8 +89,7 @@ def main(args):
             args,
             device,
         )
-
-    training_runner.train()
+        testing_runner.test_graph_mlp_v2()
 
 
 if __name__ == "__main__":
@@ -135,35 +133,40 @@ if __name__ == "__main__":
         help="Run the data integrity test and display result. Default is False.",
     )
     parser.add_argument(
+        "--model_dir",
+        type=str,
+        default="./models/structure",
+        help="Path to the directory where the trained model will be saved or loaded. Default is ./models.",
+    )
+    parser.add_argument(
+        "--param_dir",
+        type=str,
+        default="./models/parameters",
+        help="Path to the directory where the trained model will be saved or loaded. Default is ./models.",
+    )
+    parser.add_argument(
         "--k",
         type=str,
         default=[1, 3, 5],
         help="Recall@k and Precision@k list, Default is [1, 3, 5]",
     )
+
     parser.add_argument(
-        "--save_base_path",
-        type=str,
-        default="./experiments",
-        help='Base path of the model to save. Default is "./experiments"',
+        "--train_data_type", type=str, help='"norm", "extend", "kb_extend"'
     )
+    parser.add_argument(
+        "--test_data_type", type=str, help='"single", "multi", "unseen"'
+    )
+    parser.add_argument("--save_base_path", type=str, default="./experiments")
     parser.add_argument(
         "--model_name",
         type=str,
         required=True,
-        help="Model Name to train. Supports ml, ML, mlp, MLP, res, Res, graphv1, GraphV1, graphv2, and GraphV2.",
-    )
-    parser.add_argument(
-        "--train_data_type",
-        type=str,
-        help="Train data type. Supports norm, extend, and kb_extend.",
-    )
-    parser.add_argument(
-        "--device", type=int, default=0, help="Specify GPU number. Default is 0."
-    )
-    parser.add_argument(
-        "--seed", type=int, default=42, help="Set random state. Default is 42."
+        help="ml_tuned, ML_tuned, mlp, MLP, res, Res, graphv1, GraphV1, graphv2, GraphV2",
     )
     parser.add_argument("--class_weights", type=str2bool, default="False")
+    parser.add_argument("--device", type=int, default=0)
+    parser.add_argument("--seed", type=int, default=42)
 
     args = parser.parse_args()
 

@@ -1,5 +1,3 @@
-import torch
-from torch import nn
 from sklearn.linear_model import LogisticRegression
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from catboost import CatBoostClassifier
@@ -26,15 +24,22 @@ class MLTrainingRunner:
         self.train_y = train_y
         self.k = args.k
         self.seed = args.seed
+        self.class_weights = args.class_weights
+        self.train_data_type = args.train_data_type
         self.save_base_path = os.path.join(args.save_base_path, args.train_data_type)
 
     def train(self):
-        model_save_path = os.path.join(self.save_base_path, "ML/baseline")
-        os.makedirs(model_save_path, exist_ok=True)
-
         class_weights = compute_class_weights(self.train_y)
         sample_weights = compute_sample_weights(self.train_y)
 
+        model_save_path = os.path.join(self.save_base_path, "ML/baseline")
+
+        if self.class_weights and self.train_data_type == "kb_extend":
+            model_save_path = os.path.join(self.save_base_path, "ML/baseline/cw")
+        if not self.class_weights and self.train_data_type == "kb_extend":
+            model_save_path = os.path.join(self.save_base_path, "ML/baseline/ncw")
+
+        os.makedirs(model_save_path, exist_ok=True)
         lr = LogisticRegression(random_state=self.seed, class_weight="balanced")
         lr.fit(self.train_x, self.train_y)
         joblib.dump(lr, os.path.join(model_save_path, "lr.pkl"))
@@ -58,7 +63,7 @@ class MLTrainingRunner:
 
         gbc = GradientBoostingClassifier(random_state=self.seed)
         gbc.fit(self.train_x, self.train_y, sample_weight=sample_weights)
-        joblib.dump(gbc, os.path.join(model_save_path, "gbc.pkl"))
+        joblib.dump(gbc, os.path.join(model_save_path, "gb.pkl"))
 
         rf = RandomForestClassifier(
             random_state=self.seed, n_jobs=-1, class_weight="balanced"

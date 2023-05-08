@@ -15,6 +15,7 @@ import itertools
 from utils.metrics import recall_k, precision_k, f1_k, ndcg_k
 import json
 import os
+from utils.compute_weights import compute_class_weights_torch
 
 
 def init_weights(m):
@@ -55,7 +56,7 @@ class GraphV2TrainingRunner:
         self.word_idx_kb = word_idx_kb  # polymed.data_variable.word_idx_kb
         self.word_idx_allkb = word_idx_allkb  # polymed.data_variable.word_idx_allkb
         self.graph = graph  # Training_data().graph
-
+        self.class_weights = args.class_weights
         self.k = args.k
         self.save_base_path = os.path.join(args.save_base_path, args.train_data_type)
 
@@ -88,6 +89,14 @@ class GraphV2TrainingRunner:
             self.test_x, self.idx_word_total, self.word_idx_allkb, knowledge_k
         )
 
+        criterion = nn.CrossEntropyLoss()
+
+        if self.class_weights:
+            class_weight_list = compute_class_weights_torch(self.train_y).to(
+                self.device
+            )
+            criterion = nn.CrossEntropyLoss(weight=class_weight_list)
+
         graph = self.graph.to(self.device)
 
         kg_mlp = KnowledgeMLP_v2(
@@ -107,7 +116,6 @@ class GraphV2TrainingRunner:
 
         gat_net = GATv2(gat_input_feats, gat_output_feats, num_heads)
         gat_net.to(self.device)
-        criterion = nn.CrossEntropyLoss()
         optimizer = torch.optim.Adam(
             itertools.chain(
                 gat_net.parameters(), node_embed.parameters(), kg_mlp.parameters()
@@ -170,7 +178,8 @@ class GraphV2TrainingRunner:
                     {
                         "gatv2": gat_net.state_dict(),
                         "kg_mlp": kg_mlp.state_dict(),
-                        "emb": node_embed.weight,
+                        "emb": inputs,
+                        "graph": graph,
                         "optimizer": optimizer.state_dict(),
                     },
                     os.path.join(model_save_path, "knowledge_mlp_v2.pt"),
@@ -182,4 +191,13 @@ class GraphV2TrainingRunner:
                     encoding="utf-8",
                 ) as json_file:
                     json.dump(best_result, json_file, indent="\t")
+
+            if t % 100 == 0:
+                print("\n", "=" * 5, "Traning check", "=" * 5)
+                print("Recall@1: ", test_history["recall_1"][-1])
+                print("Recall@3: ", test_history["recall_3"][-1])
+                print("Recall@5: ", test_history["recall_5"][-1])
+                print("Loss: ", loss.item())
+                print("=" * 23)
+
         print("Graph MLP v2 Training done and Save the best params...")

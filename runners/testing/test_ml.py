@@ -13,6 +13,7 @@ from utils.constants import (
     KB_EXTEND_ML_MODEL_SAVE_PATH,
     EXTEND_TUNED_ML_MODEL_SAVE_PATH,
     KB_EXTEND_TUNED_ML_MODEL_SAVE_PATH,
+    KB_EXTEND_TUNED_CLASS_WEIGHTS_ML_MODEL_SAVE_PATH,
     KB_EXTEND_CLASS_WEIGHTS_ML_MODEL_SAVE_PATH,
     NORM_ML_MODEL_SAVE_PATH,
     NORM_TUNED_ML_MODEL_SAVE_PATH,
@@ -107,10 +108,10 @@ class MLTestingRunner:
         if self.train_data_type == "kb_extend":
             if self.class_weights:
                 ml_model_paths = sorted(
-                    glob(KB_EXTEND_CLASS_WEIGHTS_ML_MODEL_SAVE_PATH)
+                    glob(KB_EXTEND_TUNED_CLASS_WEIGHTS_ML_MODEL_SAVE_PATH)
                 )
                 csv_save_path = os.path.join(
-                    KB_EXTEND_CLASS_WEIGHTS_ML_MODEL_SAVE_PATH.split("*")[0],
+                    KB_EXTEND_TUNED_CLASS_WEIGHTS_ML_MODEL_SAVE_PATH.split("*")[0],
                     csv_save_name,
                 )
             else:

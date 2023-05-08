@@ -130,8 +130,6 @@ class MLTestingRunner:
             if "cat" in name:
                 trained_model = CatBoostClassifier()
                 trained_model.load_model(path)
-                trained_model = joblib.load(path)
-
             else:
                 trained_model = joblib.load(path)
 

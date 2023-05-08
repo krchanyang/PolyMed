@@ -74,7 +74,6 @@ class MLPResNetTestingRunner:
             test_result[f"f1_{k}"] = f1_k(test_pred, self.test_y, k)
             test_result[f"ndcg_{k}"] = ndcg_k(test_pred, self.test_y, k)
 
-
         result_dataframe = pd.DataFrame.from_dict([test_result])
         print(result_dataframe)
         result_dataframe.to_csv(csv_save_path, index=False)

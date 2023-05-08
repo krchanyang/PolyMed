@@ -15,8 +15,7 @@ import itertools
 from utils.metrics import recall_k, precision_k, f1_k, ndcg_k
 import json
 import os
-import numpy as np
-from utils.compute_weights import compute_class_weights
+from utils.compute_weights import compute_class_weights_torch
 
 
 def init_weights(m):
@@ -57,7 +56,7 @@ class GraphV2TrainingRunner:
         self.word_idx_kb = word_idx_kb  # polymed.data_variable.word_idx_kb
         self.word_idx_allkb = word_idx_allkb  # polymed.data_variable.word_idx_allkb
         self.graph = graph  # Training_data().graph
-
+        self.class_weights = args.class_weights
         self.k = args.k
         self.save_base_path = os.path.join(args.save_base_path, args.train_data_type)
 
@@ -90,15 +89,13 @@ class GraphV2TrainingRunner:
             self.test_x, self.idx_word_total, self.word_idx_allkb, knowledge_k
         )
 
-        class_weight = compute_class_weights(self.train_y)
-        class_weight_list = []
-        for idx, (k, v) in enumerate(class_weight.items()):
-            if idx == k:
-                class_weight_list.append(v)
-            else:
-                raise Exception('The order of labels in class weight is broken, check the weight dictionary')
+        criterion = nn.CrossEntropyLoss()
 
-        class_weight_list = torch.tensor(np.array(class_weight_list)).type(torch.FloatTensor).to(self.device)
+        if self.class_weights:
+            class_weight_list = compute_class_weights_torch(self.train_y).to(
+                self.device
+            )
+            criterion = nn.CrossEntropyLoss(weight=class_weight_list)
 
         graph = self.graph.to(self.device)
 
@@ -119,7 +116,6 @@ class GraphV2TrainingRunner:
 
         gat_net = GATv2(gat_input_feats, gat_output_feats, num_heads)
         gat_net.to(self.device)
-        criterion = nn.CrossEntropyLoss(weight=class_weight_list)
         optimizer = torch.optim.Adam(
             itertools.chain(
                 gat_net.parameters(), node_embed.parameters(), kg_mlp.parameters()

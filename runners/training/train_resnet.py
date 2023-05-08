@@ -7,8 +7,9 @@ from collections import defaultdict
 from utils.metrics import recall_k, precision_k, f1_k, ndcg_k
 import json
 import os
-from utils.compute_weights import compute_class_weights
+from utils.compute_weights import compute_class_weights_torch
 import numpy as np
+
 
 class MLPResNetTrainingRunner:
     def __init__(self, train_x, train_y, test_x, test_y, word_idx_case, args, device):
@@ -18,6 +19,7 @@ class MLPResNetTrainingRunner:
         self.test_x = test_x
         self.test_y = test_y
         self.word_idx_case = word_idx_case
+        self.class_weights = args.class_weights
         self.k = args.k
         self.save_base_path = os.path.join(args.save_base_path, args.train_data_type)
 
@@ -31,15 +33,13 @@ class MLPResNetTrainingRunner:
         test_x = torch.tensor(self.test_x).type(torch.FloatTensor).to(self.device)
         test_y = self.test_y
 
-        # class_weight = compute_class_weights(self.train_y)
-        # class_weight_list = []
-        # for idx, (k, v) in enumerate(class_weight.items()):
-        #     if idx == k:
-        #         class_weight_list.append(v)
-        #     else:
-        #         raise Exception('The order of labels in class weight is broken, check the weight dictionary')
-        #
-        # class_weight_list = torch.tensor(np.array(class_weight_list)).type(torch.FloatTensor).to(self.device)
+        criterion = nn.CrossEntropyLoss()
+
+        if self.class_weights:
+            class_weight_list = compute_class_weights_torch(self.train_y).to(
+                self.device
+            )
+            criterion = nn.CrossEntropyLoss(weight=class_weight_list)
 
         resnet_mlp = Linear_resnet(
             input_size=len(train_x[0]),
@@ -48,8 +48,6 @@ class MLPResNetTrainingRunner:
         )
         resnet_mlp = resnet_mlp.to(self.device)
 
-        # criterion = nn.CrossEntropyLoss(weight=class_weight_list)
-        criterion = nn.CrossEntropyLoss()
         optimizer = torch.optim.SGD(
             resnet_mlp.parameters(), lr=LEARNING_RATE, momentum=MMT
         )

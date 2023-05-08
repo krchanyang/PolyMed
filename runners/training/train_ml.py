@@ -31,14 +31,14 @@ class MLTrainingRunner:
     def train(self):
         class_weights = compute_class_weights(self.train_y)
         sample_weights = compute_sample_weights(self.train_y)
-        
+
         model_save_path = os.path.join(self.save_base_path, "ML/baseline")
-        
+
         if self.class_weights and self.train_data_type == "kb_extend":
             model_save_path = os.path.join(self.save_base_path, "ML/baseline/cw")
         if not self.class_weights and self.train_data_type == "kb_extend":
             model_save_path = os.path.join(self.save_base_path, "ML/baseline/ncw")
-        
+
         os.makedirs(model_save_path, exist_ok=True)
         lr = LogisticRegression(random_state=self.seed, class_weight="balanced")
         lr.fit(self.train_x, self.train_y)

@@ -22,7 +22,9 @@ KB_EXTEND_CLASS_WEIGHTS_ML_MODEL_SAVE_PATH = (
 
 EXTEND_TUNED_ML_MODEL_SAVE_PATH = "./experiments/extend/ML/tuned/*.pkl"
 KB_EXTEND_TUNED_ML_MODEL_SAVE_PATH = "./experiments/kb_extend/ML/tuned/ncw/*.pkl"
-KB_EXTEND_TUNED_CLASS_WEIGHTS_ML_MODEL_SAVE_PATH = "./experiments/kb_extend/ML/tuned/cw/*.pkl"
+KB_EXTEND_TUNED_CLASS_WEIGHTS_ML_MODEL_SAVE_PATH = (
+    "./experiments/kb_extend/ML/tuned/cw/*.pkl"
+)
 NORM_TUNED_ML_MODEL_SAVE_PATH = "./experiments/norm/ML/tuned/*.pkl"
 
 

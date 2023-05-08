@@ -79,7 +79,7 @@ class GraphV1TestingRunner:
         )
 
         params = torch.load(model_saved_path)
-        graph = params['graph']
+        graph = params["graph"]
 
         kg_mlp = KnowledgeMLP_v1(
             input_size=dc_input,
@@ -96,7 +96,6 @@ class GraphV1TestingRunner:
         gat_net = GATv2(gat_input_feats, gat_output_feats, num_heads)
         gat_net.load_state_dict(params["gatv2"])
         gat_net = gat_net.to(self.device)
-
 
         test_result = defaultdict(list)
 

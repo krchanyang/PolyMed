@@ -81,8 +81,6 @@ class GraphV2TestingRunner:
 
         test_x = torch.tensor(self.test_x).type(torch.FloatTensor).to(self.device)
 
-
-
         kbsearch = Knowledge_search(
             self.org_kb_data, self.word_idx_total, self.idx_word_total
         )
@@ -126,7 +124,6 @@ class GraphV2TestingRunner:
             test_result[f"precision_{k}"] = precision_k(test_pred, self.test_y, k)
             test_result[f"f1_{k}"] = f1_k(test_pred, self.test_y, k)
             test_result[f"ndcg_{k}"] = ndcg_k(test_pred, self.test_y, k)
-
 
         result_dataframe = pd.DataFrame.from_dict([test_result])
         result_dataframe.to_csv(csv_save_path, index=False)

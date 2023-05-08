@@ -1,4 +1,3 @@
-import numpy as np
 import torch
 from torch import nn
 from tools.Config import G_EMB_DIM, G_OUT_DIM, ATT_HEAD, CONCAT_SIZE, EPOCH
@@ -13,7 +12,8 @@ import itertools
 from utils.metrics import recall_k, precision_k, f1_k, ndcg_k
 import json
 import os
-from utils.compute_weights import compute_class_weights
+from utils.compute_weights import compute_class_weights_torch
+
 
 class GraphV1TrainingRunner:
     def __init__(
@@ -45,7 +45,7 @@ class GraphV1TrainingRunner:
         self.idx_word_total = idx_word_total  # polymed.data_variable.idx_word_total
         self.word_idx_allkb = word_idx_allkb  # polymed.data_variable.word_idx_allkb
         self.graph = graph  # Training_data().graph
-
+        self.class_weights = args.class_weights
         self.k = args.k
         self.save_base_path = os.path.join(args.save_base_path, args.train_data_type)
 
@@ -66,16 +66,13 @@ class GraphV1TrainingRunner:
         train_y = torch.tensor(self.train_y).type(torch.LongTensor).to(self.device)
         test_x = torch.tensor(self.test_x).type(torch.FloatTensor).to(self.device)
 
-        class_weight = compute_class_weights(self.train_y)
-        class_weight_list = []
-        for idx, (k, v) in enumerate(class_weight.items()):
-            if idx == k:
-                class_weight_list.append(v)
-            else:
-                raise Exception('The order of labels in class weight is broken, check the weight dictionary')
+        criterion = nn.CrossEntropyLoss()
 
-        class_weight_list = torch.tensor(np.array(class_weight_list)).type(torch.FloatTensor).to(self.device)
-
+        if self.class_weights:
+            class_weight_list = compute_class_weights_torch(self.train_y).to(
+                self.device
+            )
+            criterion = nn.CrossEntropyLoss(weight=class_weight_list)
 
         kbsearch = Knowledge_search(
             self.org_kb_data, self.word_idx_total, self.idx_word_total
@@ -87,7 +84,6 @@ class GraphV1TrainingRunner:
         test_search_list = kbsearch.knowledge_sym_search(
             self.test_x, self.idx_word_total, self.word_idx_allkb
         )
-
 
         graph = self.graph.to(self.device)
 
@@ -109,7 +105,6 @@ class GraphV1TrainingRunner:
         gat_net = GATv2(gat_input_feats, gat_output_feats, num_heads)
         gat_net.to(self.device)
 
-        criterion = nn.CrossEntropyLoss(weight=class_weight_list)
         optimizer = torch.optim.Adam(
             itertools.chain(
                 gat_net.parameters(), node_embed.parameters(), kg_mlp.parameters()
@@ -180,8 +175,6 @@ class GraphV1TrainingRunner:
                     },
                     os.path.join(model_save_path, "knowledge_mlp_v1.pt"),
                 )
-
-
 
                 with open(
                     os.path.join(model_save_path, "best_results.json"),

@@ -35,8 +35,12 @@ pip install -r requirements.txt
 ```
 
 ***
-
-
+## Simple Exploratory Data Analysis (EDA)
+```shell
+python run_data_stat.py
+```
+After run this code, the figure of data statistics saved at ``./data_stat``.
+***
 ## Train
 Download the PolyMed and place in **data** folder:
 ```shell

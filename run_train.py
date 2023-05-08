@@ -69,7 +69,7 @@ def main(args):
             org_kb_data,
             word_idx_total,
             idx_word_total,
-            word_idx_kb,
+            word_idx_allkb,
             graph,
             args,
             device,

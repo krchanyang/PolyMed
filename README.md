@@ -1,5 +1,5 @@
 # PolyMed: A Medical Dataset Addressing Disease Imbalance for Robust Automatic Diagnosis Systems
-[Paper(TBA)]() | [Weights(TBA)]() | [Dataset ![DOI: 10.5281/zenodo.7866103](https://zenodo.org/badge/DOI/10.5281/zenodo.7866103.svg)](https://doi.org/10.5281/zenodo.7866103)
+[Paper(TBA)]() | [Weights](https://drive.google.com/drive/folders/15w-i46TBs9T7QB78onARuEgnlxxC3JGS?usp=sharing) | [Dataset ![DOI: 10.5281/zenodo.7866103](https://zenodo.org/badge/DOI/10.5281/zenodo.7866103.svg)](https://doi.org/10.5281/zenodo.7866103)
 <br>
 <br>
 The **PolyMed** dataset has been developed to improve Automatic Diagnosis Systems (ADS) by addressing the limitations of existing medical case data. This dataset incorporates medical knowledge graph data and diagnosis case data to provide comprehensive evaluation, diverse disease information, effective utilization of external knowledge, and tasks closer to real-world scenarios. The data collection tools have been made publicly available to enable researchers and other interested parties to contribute additional data in a standardized format. 

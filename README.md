@@ -128,7 +128,18 @@ python run_test.py \
   * unseen: The Unseen test dataset consists of diseases not used in training process. This test dataset aim to measure the unseen diseases diagnostic ability of ADS. Especially, unseen diseases requires predicting diseases by utilizing the extenal medical knowledge(PolyMed-kg).
 
 ### Testing Guides
-Just additionally specify the type of test data following the training guides (e.g. --test_data_type "unseen" → --test_data_type "multi")
+Just additionally specify the type of test data following the training guides<br>
+- Example1-Machine Learning test for 'norm' dataset:
+   * --data_type "norm" --train_data_type "norm" --test_data_type "single" --model_name "ml_tuned"
+   * --data_type "norm" --train_data_type "norm" --test_data_type "multi" --model_name "ml_tuned"
+- Example2-Graph test for 'kb_extend' dataset:
+   * --data_type "extend" --train_data_type "kb_extend" --test_data_type "single" --model_name "graphv1"
+   * --data_type "extend" --train_data_type "kb_extend" --test_data_type "unseen" --model_name "graphv1"
+   * --data_type "extend" --train_data_type "kb_extend" --test_data_type "multi" --model_name "graphv1"
+- Example3-resmlp test for 'extend' dataset:
+   * --data_type "extend" --train_data_type "extend" --test_data_type "single" --model_name "res"
+   * --data_type "extend" --train_data_type "extend" --test_data_type "unseen" --model_name "res"
+   * --data_type "extend" --train_data_type "extend" --test_data_type "multi" --model_name "res"
 ***
 ### Installation Issues
 If you encounter a version collision or Not Found Error of specific library during the installation of requirements, follow these steps:<br>

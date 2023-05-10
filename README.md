@@ -147,10 +147,11 @@ If you encounter a version collision or Not Found Error of specific library duri
 ```shell
 pip install -r re_env.txt
 ```
-2. Second, install PyTorch according to your specific requirements. You can find instructions for installing PyTorch on the official website: https://pytorch.org/get-started.
+2. Second, install cupy according to your specific requirements. You can find instructions for installing cupy on the official website: https://docs.cupy.dev/en/stable/install.html
+3. Third, install PyTorch according to your specific requirements. You can find instructions for installing PyTorch on the official website: https://pytorch.org/get-started.
 Make sure to install the correct version of PyTorch that matches your system's specifications.
 
-3. Finally, install DGL according to your specific requirements. You can find instructions for installing DGL on the official website: https://www.dgl.ai/pages/start.html.
+4. Finally, install DGL according to your specific requirements. You can find instructions for installing DGL on the official website: https://www.dgl.ai/pages/start.html.
 Make sure to install the version of DGL that matches your PyTorch version (including any CUDA or cuDNN specifications).
 ***
 ### Experiment Environment

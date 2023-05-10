@@ -113,7 +113,18 @@ python run_test.py \
 
 ### Testing Guides
 Just additionally specify the type of test data following the training guides (e.g. --test_data_type "unseen" → --test_data_type "multi")
+***
+### Installation Issues
+If you encounter a version collision or Not Found Error of specific library during the installation of requirements, follow these steps:<br>
+1. First, install the re_env.txt file using the following command:<br>
+```shell
+pip install -r re_env.txt
+```
+2. install PyTorch according to your specific requirements. You can find instructions for installing PyTorch on the official website: https://pytorch.org/get-started.
+Make sure to install the correct version of PyTorch that matches your system's specifications.
 
+3. Finally, install DGL according to your specific requirements. You can find instructions for installing DGL on the official website: https://www.dgl.ai/pages/start.html.
+Make sure to install the version of DGL that matches your PyTorch version (including any CUDA or cuDNN specifications).
 ***
 ### Experiment Environment
 - CPU: AMD Ryzen Threadripper PRO 5995WX (64 cores, 128 threads)

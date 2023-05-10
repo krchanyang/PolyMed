@@ -34,6 +34,21 @@ Download and extract these files to the following location:<br>
 
 It is important to follow the file structure provided to ensure that the models can access the necessary data and weights during training and testing.
 ***
+
+## Docker Image
+```shell
+docker pull kimjonghyeon/polymed
+```
+
+1. Create Container with Local Repository
+```shell
+docker run -it -v {$your_path}/PolyMed:/home/PolyMed --name "polymed" --gpus "device=0" kimjonghyeon/polymed
+```
+2. Change Directory
+```shell
+$ cd /home/PolyMed
+```
+
 ## Anaconda Environment
 [![Python 3.8](https://img.shields.io/badge/python-3.8-blue.svg)](https://www.python.org/downloads/release/python-3812/)
 

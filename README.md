@@ -100,7 +100,7 @@ python run_test.py \
 --test_data_type "unseen" \
 --class_weights "True" \
 --save_base_path "./experiments" \
---model_name "ML" \
+--model_name "ml_tuned" \
 --device 0 \
 --seed 42 \
 ```

@@ -7,7 +7,16 @@ The **PolyMed** dataset has been developed to improve Automatic Diagnosis System
 ```
 repo
   |——data
+    |——eng_external_medical_knowledge.json
+    |——eng_test_multi.json
+    |——eng_test_single.json
+    |——eng_test_unseen.json
+    |——eng_train.json
   |——data_stat
+  |——experiments
+    |——extend
+    |——kb_extend
+    |——norm
   |——models
   |——runners
     |——training
@@ -16,8 +25,15 @@ repo
   |——tools
   |——utils
 ```
-***
 
+Our baseline models have been trained on PolyMed, which are available for download in the [Dataset](https://doi.org/10.5281/zenodo.7866103) and [Weights](https://drive.google.com/drive/folders/15w-i46TBs9T7QB78onARuEgnlxxC3JGS?usp=sharing), respectively.
+
+Download and extract these files to the following location:<br>
+ *Dataset -> ./data<br>
+ *weights -> ./experiments<br>
+
+It is important to follow the file structure provided to ensure that the models can access the necessary data and weights during training and testing.
+***
 ## Anaconda Environment
 [![Python 3.8](https://img.shields.io/badge/python-3.8-blue.svg)](https://www.python.org/downloads/release/python-3812/)
 
@@ -112,7 +128,18 @@ python run_test.py \
   * unseen: The Unseen test dataset consists of diseases not used in training process. This test dataset aim to measure the unseen diseases diagnostic ability of ADS. Especially, unseen diseases requires predicting diseases by utilizing the extenal medical knowledge(PolyMed-kg).
 
 ### Testing Guides
-Just additionally specify the type of test data following the training guides (e.g. --test_data_type "unseen" → --test_data_type "multi")
+Just additionally specify the type of test data following the training guides<br>
+- Example1-Machine Learning test for 'norm' dataset:
+   * --data_type "norm" --train_data_type "norm" --test_data_type "single" --model_name "ml_tuned"
+   * --data_type "norm" --train_data_type "norm" --test_data_type "multi" --model_name "ml_tuned"
+- Example2-Graph test for 'kb_extend' dataset:
+   * --data_type "extend" --train_data_type "kb_extend" --test_data_type "single" --model_name "graphv1"
+   * --data_type "extend" --train_data_type "kb_extend" --test_data_type "unseen" --model_name "graphv1"
+   * --data_type "extend" --train_data_type "kb_extend" --test_data_type "multi" --model_name "graphv1"
+- Example3-resmlp test for 'extend' dataset:
+   * --data_type "extend" --train_data_type "extend" --test_data_type "single" --model_name "res"
+   * --data_type "extend" --train_data_type "extend" --test_data_type "unseen" --model_name "res"
+   * --data_type "extend" --train_data_type "extend" --test_data_type "multi" --model_name "res"
 ***
 ### Installation Issues
 If you encounter a version collision or Not Found Error of specific library during the installation of requirements, follow these steps:<br>
@@ -120,7 +147,7 @@ If you encounter a version collision or Not Found Error of specific library duri
 ```shell
 pip install -r re_env.txt
 ```
-2. install PyTorch according to your specific requirements. You can find instructions for installing PyTorch on the official website: https://pytorch.org/get-started.
+2. Second, install PyTorch according to your specific requirements. You can find instructions for installing PyTorch on the official website: https://pytorch.org/get-started.
 Make sure to install the correct version of PyTorch that matches your system's specifications.
 
 3. Finally, install DGL according to your specific requirements. You can find instructions for installing DGL on the official website: https://www.dgl.ai/pages/start.html.

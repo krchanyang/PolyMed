@@ -50,7 +50,7 @@ class MLPTestingRunner:
             )
             csv_save_path = os.path.join(KB_EXTEND_MLP_MODEL_SAVE_PATH, csv_save_name)
 
-        params = torch.load(model_saved_path)
+        params = torch.load(model_saved_path, map_location=self.device)
         simple_mlp.load_state_dict(params["model"])
 
         test_result = defaultdict(dict)

@@ -90,7 +90,7 @@ class GraphV2TestingRunner:
 
         graph = self.graph.to(self.device)
 
-        params = torch.load(model_saved_path)
+        params = torch.load(model_saved_path, map_location=self.device)
 
         kg_mlp = KnowledgeMLP_v2(
             input_size=dc_input,

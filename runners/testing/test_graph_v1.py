@@ -78,7 +78,7 @@ class GraphV1TestingRunner:
             self.test_x, self.idx_word_total, self.word_idx_allkb
         )
 
-        params = torch.load(model_saved_path)
+        params = torch.load(model_saved_path, map_location=self.device)
         graph = params["graph"]
 
         kg_mlp = KnowledgeMLP_v1(

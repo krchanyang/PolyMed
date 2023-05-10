@@ -122,7 +122,7 @@ class MLTestingRunner:
 
         for path in ml_model_paths:
             print(f"path: {path}")
-            name = path.split("/")[-1].split(".pkl")[0].split("_")[0]
+            name = path.replace('\\','/').split("/")[-1].split(".pkl")[0].split("_")[0]
             print(f"name: {name}")
             model_name = ML_MODEL_DICT[name]
             results["model"].append(model_name)

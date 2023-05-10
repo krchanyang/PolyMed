@@ -57,7 +57,7 @@ class MLPResNetTestingRunner:
                 KB_EXTEND_RESNET_MODEL_SAVE_PATH, csv_save_name
             )
 
-        params = torch.load(model_saved_path)
+        params = torch.load(model_saved_path, map_location=self.device)
         resnet_mlp.load_state_dict(params["model"])
 
         test_result = defaultdict(list)

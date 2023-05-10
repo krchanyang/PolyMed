@@ -7,7 +7,16 @@ The **PolyMed** dataset has been developed to improve Automatic Diagnosis System
 ```
 repo
   |——data
+    |——eng_external_medical_knowledge.json
+    |——eng_test_multi.json
+    |——eng_test_single.json
+    |——eng_test_unseen.json
+    |——eng_train.json
   |——data_stat
+  |——experiments
+    |——extend
+    |——kb_extend
+    |——norm
   |——models
   |——runners
     |——training
@@ -16,8 +25,15 @@ repo
   |——tools
   |——utils
 ```
-***
 
+Our baseline models have been trained on PolyMed, which are available for download in the [Dataset](https://doi.org/10.5281/zenodo.7866103) and [Weights](https://drive.google.com/drive/folders/15w-i46TBs9T7QB78onARuEgnlxxC3JGS?usp=sharing), respectively.
+
+Download and extract these files to the following location:<br>
+ *Dataset -> ./data<br>
+ *weights -> ./experiments<br>
+
+It is important to follow the file structure provided to ensure that the models can access the necessary data and weights during training and testing.
+***
 ## Anaconda Environment
 [![Python 3.8](https://img.shields.io/badge/python-3.8-blue.svg)](https://www.python.org/downloads/release/python-3812/)
 

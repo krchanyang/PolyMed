@@ -115,7 +115,7 @@ python run_test.py \
 Just additionally specify the type of test data following the training guides (e.g. --test_data_type "unseen" → --test_data_type "multi")
 ***
 ### Installation Issues
-If you encounter a version collision or not found error during the installation of requirements, follow these steps:<br>
+If you encounter a version collision or Not Found Error of specific library during the installation of requirements, follow these steps:<br>
 1. First, install the re_env.txt file using the following command:<br>
 ```shell
 pip install -r re_env.txt

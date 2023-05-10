@@ -35,7 +35,7 @@ Download and extract these files to the following location:<br>
 It is important to follow the file structure provided to ensure that the models can access the necessary data and weights during training and testing.
 ***
 
-## Docker Image
+## Docker Image (Option 1)
 ```shell
 docker pull kimjonghyeon/polymed
 ```
@@ -49,7 +49,7 @@ docker run -it -v {$your_path}/PolyMed:/home/PolyMed --name "polymed" --gpus "de
 $ cd /home/PolyMed
 ```
 
-## Anaconda Environment
+## Anaconda Environment (Option 2)
 [![Python 3.8](https://img.shields.io/badge/python-3.8-blue.svg)](https://www.python.org/downloads/release/python-3812/)
 
 1. Create Anaconda Environment
@@ -82,7 +82,7 @@ python run_train.py \
 --save_base_path "./experiments" \
 --model_name "ML" \
 --device 0 \
---seed 42 \
+--seed 42
 ```
 
 After run this code, the trained models saved at ``./experiments/{train_data_type}/{model_name}``.
@@ -133,7 +133,7 @@ python run_test.py \
 --save_base_path "./experiments" \
 --model_name "ml_tuned" \
 --device 0 \
---seed 42 \
+--seed 42
 ```
 
 ### Arguments

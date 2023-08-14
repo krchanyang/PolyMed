@@ -33,19 +33,18 @@ RUN apt-get update -y && apt-get upgrade -y && apt-get install -y --no-install-r
     libreadline-dev && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN wget https://www.python.org/ftp/python/3.8.5/Python-3.8.5.tgz
-RUN tar -xvzf Python-3.8.5.tgz
+RUN wget https://www.python.org/ftp/python/3.8.5/Python-3.8.5.tgz && \
+    tar -xvzf Python-3.8.5.tgz && \
+    cd Python-3.8.5 && \
+    ./configure --enable-optimizations --prefix=/usr && \
+    make && \
+    make install
+    
+RUN echo "alias python=python3.8" >> ~/.bashrc && \
+    ln -s /usr/bin/python3.8 /usr/bin/python
 
-WORKDIR Python-3.8.5
-RUN ./configure
-RUN make install
+COPY requirements.txt .
 
-WORKDIR /
-RUN rm -rf Python-3.8.5 \
-    rm Python-3.8.5.tgz
+RUN python -m pip install --upgrade pip
 
-RUN echo "alias python=python3.8" >> ~/.bashrc
-
-RUN python3 -m pip install --upgrade pip
-RUN wget "https://raw.githubusercontent.com/krchanyang/PolyMed/main/requirements.txt"
-RUN pip install -r requirements.txt
+RUN pip install --no-dependencies -r requirements.txt

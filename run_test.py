@@ -14,7 +14,6 @@ from utils.translation import str2bool
 
 def main(args):
     seed_everything(args.seed)
-    os.environ["CUDA_VISIBLE_DEVICES"] = str(args.device)
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     polymed = PolyMed(
@@ -167,6 +166,11 @@ if __name__ == "__main__":
     parser.add_argument("--class_weights", type=str2bool, default="False")
     parser.add_argument("--device", type=int, default=0)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument(
+    "--augmentation_strategy",
+    type=str,
+    help="Train data augmentation strategies. Supports None, SMOTE, Balance, and Tomek. The default is None.",
+    default=None)
 
     args = parser.parse_args()
 

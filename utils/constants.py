@@ -13,8 +13,8 @@ ML_MODEL_DICT = {
     "lgbm": "LGBMClassifier",
 }
 
-NORM_ML_MODEL_SAVE_PATH = "./experiments/norm/ML/baseline/*.pkl"
-EXTEND_ML_MODEL_SAVE_PATH = "./experiments/extend/ML/baseline/*.pkl"
+NORM_ML_MODEL_SAVE_PATH = "./experiments/norm/ML/{}/baseline/*.pkl"
+EXTEND_ML_MODEL_SAVE_PATH = "./experiments/extend/ML/{}/baseline/*.pkl"
 KB_EXTEND_ML_MODEL_SAVE_PATH = "./experiments/kb_extend/ML/baseline/ncw/*.pkl"
 KB_EXTEND_CLASS_WEIGHTS_ML_MODEL_SAVE_PATH = (
     "./experiments/kb_extend/ML/baseline/cw/*.pkl"

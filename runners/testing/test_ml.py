@@ -27,6 +27,7 @@ class MLTestingRunner:
         self.k = args.k
         self.train_data_type = args.train_data_type
         self.test_data_type = args.test_data_type
+        self.augmentation_strategy = args.augmentation_strategy
         self.class_weights = args.class_weights
         self.device = device
 
@@ -34,18 +35,20 @@ class MLTestingRunner:
         results = defaultdict(list)
 
         csv_save_name = (
-            f"ml_baseline_{self.train_data_type}_{self.test_data_type}_result.csv"
+            f"ml_baseline_{self.train_data_type}_{self.augmentation_strategy}_{self.test_data_type}_result.csv"
         )
 
         if self.train_data_type == "norm":
-            ml_model_paths = sorted(glob(NORM_ML_MODEL_SAVE_PATH))
+            model_saved_path = NORM_ML_MODEL_SAVE_PATH.format(self.augmentation_strategy)
+            ml_model_paths = sorted(glob(model_saved_path))
             csv_save_path = os.path.join(
-                NORM_ML_MODEL_SAVE_PATH.split("*")[0], csv_save_name
+                model_saved_path.split("*")[0], csv_save_name
             )
         if self.train_data_type == "extend":
-            ml_model_paths = sorted(glob(EXTEND_ML_MODEL_SAVE_PATH))
+            model_saved_path = EXTEND_ML_MODEL_SAVE_PATH.format(self.augmentation_strategy)
+            ml_model_paths = sorted(glob(model_saved_path))
             csv_save_path = os.path.join(
-                EXTEND_ML_MODEL_SAVE_PATH.split("*")[0], csv_save_name
+                model_saved_path.split("*")[0], csv_save_name
             )
         if self.train_data_type == "kb_extend":
             if self.class_weights:

@@ -21,8 +21,10 @@ class PolymedDataset:
         self.is_training = is_training
 
     def load_train_data(self):
-        train_data = Training_data(self.polymed, "train")
-
+        if "graph" in self.model_name.lower():
+            train_data = Training_data(self.polymed, "train", "graph")
+        else:
+            train_data = Training_data(self.polymed, "train", "basic")
         if self.train_data_type == "extend" or self.train_data_type == "norm":
             train_x = train_data.train_x
             train_y = train_data.train_y

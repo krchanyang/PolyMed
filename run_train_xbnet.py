@@ -1,22 +1,19 @@
 from tools.PolyMed import PolyMed
-from runners.training.train_ml import MLTrainingRunner
-from runners.training.train_mlp import MLPTrainingRunner
-from runners.training.train_resnet import MLPResNetTrainingRunner
-from runners.training.train_graph_v1 import GraphV1TrainingRunner
-from runners.training.train_graph_v2 import GraphV2TrainingRunner
 from runners.training.train_xbnet import XBNetTrainingRunner
 from utils.datasets import PolymedDataset
 from utils.fix_seed import seed_everything
-from tools.imbalance import basic_SMOTE, balance_SMOTE, basic_SMOTE_Tomek
-import os
+from typing import Optional
 import torch
+import os
 import argparse
 from utils.translation import str2bool
-
+from tools.imbalance import basic_SMOTE, balance_SMOTE, basic_SMOTE_Tomek
 
 def main(args):
+    os.environ["CUDA_VISIBLE_DEVICES"] = str(args.device)
     os.makedirs("./experiments", exist_ok=True)
     seed_everything(args.seed)
+
     device = f"cuda" if torch.cuda.is_available() else "cpu"
 
     polymed = PolyMed(
@@ -58,52 +55,11 @@ def main(args):
                 train_x, train_y = basic_SMOTE_Tomek(train_x, train_y) 
     test_x, test_y = dataset.load_test_data()
 
+
     print(f"train_x shape: {train_x.shape} | train_y.shape: {train_y.shape}")
 
-    if args.model_name.lower() == "ml":
-        training_runner = MLTrainingRunner(train_x, train_y, args, device)
-    if args.model_name.lower() == "mlp":
-        training_runner = MLPTrainingRunner(
-            train_x, train_y, test_x, test_y, word_idx_case, args, device
-        )
-    if args.model_name.lower() == "res":
-        training_runner = MLPResNetTrainingRunner(
-            train_x, train_y, test_x, test_y, word_idx_case, args, device
-        )
-    if args.model_name.lower() == "xbnet":
-        training_runner = XBNetTrainingRunner(train_x, train_y, test_x, test_y, word_idx_case, args, device)
-    if args.model_name.lower() == "graphv1":
-        training_runner = GraphV1TrainingRunner(
-            train_x,
-            train_y,
-            test_x,
-            test_y,
-            word_idx_case,
-            org_kb_data,
-            word_idx_total,
-            idx_word_total,
-            word_idx_allkb,
-            graph,
-            args,
-            device,
-        )
-    if args.model_name.lower() == "graphv2":
-        training_runner = GraphV2TrainingRunner(
-            train_x,
-            train_y,
-            test_x,
-            test_y,
-            word_idx_case,
-            org_kb_data,
-            word_idx_total,
-            idx_word_total,
-            word_idx_kb,
-            word_idx_allkb,
-            graph,
-            args,
-            device,
-        )
-
+    
+    training_runner = XBNetTrainingRunner(train_x, train_y, test_x, test_y, word_idx_case, args, device)
     training_runner.train()
 
 
@@ -172,7 +128,8 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--device", type=int, default=0, help="Specify GPU number. Default is 0."
-    )
+    """_summary_
+    """    )
     parser.add_argument(
         "--seed", type=int, default=42, help="Set random state. Default is 42."
     )
@@ -181,7 +138,9 @@ if __name__ == "__main__":
         "--augmentation_strategy",
         type=str,
         help="Train data augmentation strategies. Supports None, SMOTE, Balance, and Tomek. The default is None.",
-        default=None)
+        default=None
+        )    
+    # parser.add_argument("--num_layers", type=int, help="Number of layers of XBNet", default=2)
     args = parser.parse_args()
 
     main(args)

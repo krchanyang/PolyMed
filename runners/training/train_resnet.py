@@ -21,11 +21,13 @@ class MLPResNetTrainingRunner:
         self.word_idx_case = word_idx_case
         self.class_weights = args.class_weights
         self.k = args.k
+        self.augmentation_strategy = args.augmentation_strategy
         self.save_base_path = os.path.join(args.save_base_path, args.train_data_type)
 
     def train(self):
         print("MLP ResNet Training Start...")
         model_save_path = os.path.join(self.save_base_path, "ResNet")
+        model_save_path = os.path.join(model_save_path, str(self.augmentation_strategy))
         os.makedirs(model_save_path, exist_ok=True)
 
         train_x = torch.tensor(self.train_x).type(torch.FloatTensor).to(self.device)
@@ -96,22 +98,36 @@ class MLPResNetTrainingRunner:
                     best_result[f"precision_{k}"] = test_history[f"precision_{k}"][-1]
                     best_result[f"f1_{k}"] = test_history[f"f1_{k}"][-1]
                     best_result[f"ndcg_{k}"] = test_history[f"ndcg_{k}"][-1]
+                if not self.class_weights:
+                    torch.save(
+                        {
+                            "model": resnet_mlp.state_dict(),
+                            "optimizer": optimizer.state_dict(),
+                        },
+                        os.path.join(model_save_path, "resnet_mlp.pt"),
+                    )
 
-                torch.save(
-                    {
-                        "model": resnet_mlp.state_dict(),
-                        "optimizer": optimizer.state_dict(),
-                    },
-                    os.path.join(model_save_path, "resnet_mlp.pt"),
-                )
+                    with open(
+                        os.path.join(model_save_path, "best_results.json"),
+                        "w",
+                        encoding="utf-8",
+                    ) as json_file:
+                        json.dump(best_result, json_file, indent="\t")
+                else:
+                    torch.save(
+                        {
+                            "model": resnet_mlp.state_dict(),
+                            "optimizer": optimizer.state_dict(),
+                        },
+                        os.path.join(model_save_path, "resnet_mlp_cw.pt"),
+                    )
 
-                with open(
-                    os.path.join(model_save_path, "best_results.json"),
-                    "w",
-                    encoding="utf-8",
-                ) as json_file:
-                    json.dump(best_result, json_file, indent="\t")
-
+                    with open(
+                        os.path.join(model_save_path, "best_results_cw.json"),
+                        "w",
+                        encoding="utf-8",
+                    ) as json_file:
+                        json.dump(best_result, json_file, indent="\t")
             if t % 100 == 0:
                 print("\n", "=" * 5, "Traning check", "=" * 5)
                 print("Recall@1: ", test_history["recall_1"][-1])

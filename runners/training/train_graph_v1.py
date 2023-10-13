@@ -47,11 +47,13 @@ class GraphV1TrainingRunner:
         self.graph = graph  # Training_data().graph
         self.class_weights = args.class_weights
         self.k = args.k
+        self.augmentation_strategy = args.augmentation_strategy
         self.save_base_path = os.path.join(args.save_base_path, args.train_data_type)
 
     def train(self):
         print("Graph MLP v1 Training Start...")
         model_save_path = os.path.join(self.save_base_path, "Graph_v1")
+        model_save_path = os.path.join(model_save_path, str(self.augmentation_strategy))
         os.makedirs(model_save_path, exist_ok=True)
 
         gat_input_feats = G_EMB_DIM
@@ -165,23 +167,43 @@ class GraphV1TrainingRunner:
                     best_result[f"precision_{k}"] = test_history[f"precision_{k}"][-1]
                     best_result[f"f1_{k}"] = test_history[f"f1_{k}"][-1]
                     best_result[f"ndcg_{k}"] = test_history[f"ndcg_{k}"][-1]
-                torch.save(
-                    {
-                        "gatv2": gat_net.state_dict(),
-                        "kg_mlp": kg_mlp.state_dict(),
-                        "emb": inputs,
-                        "graph": graph,
-                        "optimizer": optimizer.state_dict(),
-                    },
-                    os.path.join(model_save_path, "knowledge_mlp_v1.pt"),
-                )
+                    
+                if not self.class_weights:
+                    torch.save(
+                        {
+                            "gatv2": gat_net.state_dict(),
+                            "kg_mlp": kg_mlp.state_dict(),
+                            "emb": inputs,
+                            "graph": graph,
+                            "optimizer": optimizer.state_dict(),
+                        },
+                        os.path.join(model_save_path, "knowledge_mlp_v1.pt"),
+                    )
 
-                with open(
-                    os.path.join(model_save_path, "best_results.json"),
-                    "w",
-                    encoding="utf-8",
-                ) as json_file:
-                    json.dump(best_result, json_file, indent="\t")
+                    with open(
+                        os.path.join(model_save_path, "best_results.json"),
+                        "w",
+                        encoding="utf-8",
+                    ) as json_file:
+                        json.dump(best_result, json_file, indent="\t")
+                else:
+                    torch.save(
+                        {
+                            "gatv2": gat_net.state_dict(),
+                            "kg_mlp": kg_mlp.state_dict(),
+                            "emb": inputs,
+                            "graph": graph,
+                            "optimizer": optimizer.state_dict(),
+                        },
+                        os.path.join(model_save_path, "knowledge_mlp_v1_cw.pt"),
+                    )
+
+                    with open(
+                        os.path.join(model_save_path, "best_results_cw.json"),
+                        "w",
+                        encoding="utf-8",
+                    ) as json_file:
+                        json.dump(best_result, json_file, indent="\t")
 
             if t % 100 == 0:
                 print("\n", "=" * 5, "Traning check", "=" * 5)

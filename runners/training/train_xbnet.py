@@ -21,8 +21,8 @@ class XBNetTrainingRunner:
         self.word_idx_case = word_idx_case
         self.class_weights = args.class_weights
         # self.args = args
-        self.k = args.k
-        self.save_base_path = os.path.join(args.save_base_path, args.train_data_type)
+        self.args = args
+        # self.save_base_path = os.path.join(args.save_base_path, args.train_data_type)
         self.model_layer = {
             1: {
                 'input': len(train_x[0]),
@@ -42,8 +42,8 @@ class XBNetTrainingRunner:
 
     def train(self):
         print("XBNet Training Start...")
-        model_save_path = os.path.join(self.save_base_path, "XBNet")
-        os.makedirs(model_save_path, exist_ok=True)
+        # model_save_path = os.path.join(self.save_base_path, "XBNet")
+        # os.makedirs(model_save_path, exist_ok=True)
 
         train_x = self.train_x
         train_y = self.train_y
@@ -68,7 +68,7 @@ class XBNetTrainingRunner:
                 
         optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 
-        m, acc, lo, val_ac, val_lo = run_XBNET(train_x, test_x, train_y, test_y, model, criterion, optimizer, self.k, batch_size=512, epochs=300)
+        m, acc, lo, val_ac, val_lo = run_XBNET(train_x, test_x, train_y, test_y, model, criterion, optimizer, self.args, batch_size=512, epochs=300)
         # torch.save(
         #     {
         #         "xbnet": m.state_dict(),

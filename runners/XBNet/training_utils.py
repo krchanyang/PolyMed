@@ -4,9 +4,12 @@ import matplotlib.pyplot as plt
 import torch
 from tqdm import tqdm
 from collections import defaultdict
+from utils.metrics import recall_k, precision_k, f1_k, ndcg_k
+import os
+import json
 
 
-def training(model,trainDataload,testDataload,criterion,optimizer,k, epochs = 100,save = False):
+def training(model,trainDataload,testDataload,criterion,optimizer,args, epochs = 100,save = False):
     '''
     Training function for training the model with the given data
     :param model(XBNET Classifier/Regressor): model to be trained
@@ -18,11 +21,21 @@ def training(model,trainDataload,testDataload,criterion,optimizer,k, epochs = 10
     :return:
     list of training accuracy, training loss, testing accuracy, testing loss for all the epochs
     '''
+    
+    save_base_path = os.path.join(args.save_base_path, args.train_data_type)
+    model_save_path = os.path.join(save_base_path, "XBNet")
+    model_save_path = os.path.join(model_save_path, str(args.augmentation_strategy))
+    os.makedirs(model_save_path, exist_ok=True)
+    
     accuracy = []
     lossing = []
     val_acc = []
     val_loss = []
-    print(f"k: {k}")
+    
+    train_history = defaultdict(list)
+    test_history = defaultdict(list)
+    best_result = defaultdict(dict)
+    prev_test_recall_1 = 1e-4
     for epochs in tqdm(range(epochs),desc="Percentage training completed: "):
         running_loss = 0
         predictions = []
@@ -30,6 +43,8 @@ def training(model,trainDataload,testDataload,criterion,optimizer,k, epochs = 10
         correct = 0
         total = 0
         loss = None
+        model.train()
+        optimizer.zero_grad()
         for inp, out in trainDataload:
             try:
                 if out.shape[0] >= 1:
@@ -45,41 +60,108 @@ def training(model,trainDataload,testDataload,criterion,optimizer,k, epochs = 10
             running_loss += loss.item()    
             loss.backward()
             optimizer.step()
-            optimizer.zero_grad()
-            
-            for i, p in enumerate(model.parameters()):
-                if i < model.num_layers_boosted:
-                    l0 = torch.unsqueeze(model.sequential.boosted_layers[i], 1)
-                    lMin = torch.min(p.grad)
-                    lPower = torch.log(torch.abs(lMin))
-                    if lMin != 0:
-                        l0 = l0 * 10 ** lPower
-                        p.grad += l0
-                    else:
-                        pass
+        for i, p in enumerate(model.parameters()):
+            if i < model.num_layers_boosted:
+                l0 = torch.unsqueeze(model.sequential.boosted_layers[i], 1)
+                lMin = torch.min(p.grad)
+                lPower = torch.log(torch.abs(lMin))
+                if lMin != 0:
+                    l0 = l0 * 10 ** lPower
+                    p.grad += l0
                 else:
                     pass
-            outputs = model(inp.float(),train = False)
-            predicted = outputs
-            total += out.float().size(0)
-            if model.name == "Regression":
-                pass
             else:
-                if model.labels == 1:
-                    for i in range(len(predicted)):
-                        if predicted[i] < torch.Tensor([0.5]):
-                            predicted[i] = 0
-                        else:
-                            predicted[i] =1
+                pass
+        outputs = model(inp.float(),train = False)
+        predicted = outputs
+        total += out.float().size(0)
+        if model.name == "Regression":
+            pass
+        else:
+            if model.labels == 1:
+                for i in range(len(predicted)):
+                    if predicted[i] < torch.Tensor([0.5]):
+                        predicted[i] = 0
+                    else:
+                        predicted[i] =1
 
-                        if predicted[i].type(torch.LongTensor) == out[i]:
-                            correct += 1
-                else:
-                    _, predicted = torch.max(outputs.data, 1)
-                    correct += (predicted == out.long()).sum().item()
+                    if predicted[i].type(torch.LongTensor) == out[i]:
+                        correct += 1
+            else:
+                _, predicted = torch.max(outputs.data, 1)
+                correct += (predicted == out.long()).sum().item()
 
-            predictions.extend(predicted.detach().numpy())
-            act.extend(out.detach().numpy())
+        predictions.extend(predicted.detach().numpy())
+        act.extend(out.detach().numpy())    
+        
+        train_history["train_loss"].append(running_loss / len(trainDataload))
+        # Test
+        test_preds = []
+        test_labels = []
+        model.eval()
+        with torch.no_grad():
+            for test_x, test_y in testDataload:
+                test_pred = model(test_x.float())
+                test_pred = test_pred.cpu().detach().numpy()
+                test_preds.extend(test_pred)
+                test_labels.extend(test_y.float().numpy())
+        for k in args.k:
+            test_history[f"recall_{k}"].append(recall_k(test_preds, test_labels, k))
+            test_history[f"precision_{k}"].append(precision_k(test_preds, test_labels, k))
+            test_history[f"f1_{k}"].append(f1_k(test_preds, test_labels, k))
+            test_history[f"ndcg_{k}"].append(ndcg_k(test_preds, test_labels, k))
+        
+        test_recall_1 = test_history["recall_1"][-1]
+        if prev_test_recall_1 < test_recall_1:
+            prev_test_recall_1 = test_recall_1
+
+            best_result["epoch"] = epochs + 1
+            best_result["train_loss"] = train_history["train_loss"][-1]
+            for k in args.k:
+                best_result[f"recall_{k}"] = test_history[f"recall_{k}"][-1]
+                best_result[f"precision_{k}"] = test_history[f"precision_{k}"][-1]
+                best_result[f"f1_{k}"] = test_history[f"f1_{k}"][-1]
+                best_result[f"ndcg_{k}"] = test_history[f"ndcg_{k}"][-1]
+            if not args.class_weights:
+                torch.save(
+                    {
+                        "model": model.state_dict(),
+                        "optimizer": optimizer.state_dict(),
+                    },
+                    os.path.join(model_save_path, "xbnet.pt"),
+                )
+
+                with open(
+                    os.path.join(model_save_path, "best_results.json"),
+                    "w",
+                    encoding="utf-8",
+                ) as json_file:
+                    json.dump(best_result, json_file, indent="\t")
+            else:
+                torch.save(
+                    {
+                        "model": model.state_dict(),
+                        "optimizer": optimizer.state_dict(),
+                    },
+                    os.path.join(model_save_path, "xbnet_cw.pt"),
+                )
+
+                with open(
+                    os.path.join(model_save_path, "best_results_cw.json"),
+                    "w",
+                    encoding="utf-8",
+                ) as json_file:
+                    json.dump(best_result, json_file, indent="\t")
+
+                print("\n", "=" * 5, "Traning check", "=" * 5)
+                print("Recall@1: ", test_history["recall_1"][-1])
+                print("Recall@3: ", test_history["recall_3"][-1])
+                print("Recall@5: ", test_history["recall_5"][-1])
+                print("Loss: ", loss.item())
+                print("=" * 23)
+
+            
+
         lossing.append(running_loss/len(trainDataload))
         
         

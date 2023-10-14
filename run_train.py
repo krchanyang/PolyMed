@@ -5,6 +5,7 @@ from runners.training.train_resnet import MLPResNetTrainingRunner
 from runners.training.train_graph_v1 import GraphV1TrainingRunner
 from runners.training.train_graph_v2 import GraphV2TrainingRunner
 from runners.training.train_xbnet import XBNetTrainingRunner
+from runners.training.train_tabnet import TabNetTrainingRunner
 from utils.datasets import PolymedDataset
 from utils.fix_seed import seed_everything
 from tools.imbalance import basic_SMOTE, balance_SMOTE, basic_SMOTE_Tomek
@@ -72,6 +73,8 @@ def main(args):
         )
     if args.model_name.lower() == "xbnet":
         training_runner = XBNetTrainingRunner(train_x, train_y, test_x, test_y, word_idx_case, args, device)
+    if args.model_name.lower() == "tabnet":
+        training_runner = TabNetTrainingRunner(train_x, train_y, test_x, test_y, word_idx_case, args, device)
     if args.model_name.lower() == "graphv1":
         training_runner = GraphV1TrainingRunner(
             train_x,

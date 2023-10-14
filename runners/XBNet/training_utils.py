@@ -7,6 +7,7 @@ from collections import defaultdict
 from utils.metrics import recall_k, precision_k, f1_k, ndcg_k
 import os
 import json
+import joblib
 
 
 def training(model,trainDataload,testDataload,criterion,optimizer,args, epochs = 100,save = False):
@@ -123,6 +124,8 @@ def training(model,trainDataload,testDataload,criterion,optimizer,args, epochs =
                 best_result[f"f1_{k}"] = test_history[f"f1_{k}"][-1]
                 best_result[f"ndcg_{k}"] = test_history[f"ndcg_{k}"][-1]
             if not args.class_weights:
+                joblib.dump(model, os.path.join(model_save_path, "xbnet.pkl"))
+                
                 torch.save(
                     {
                         "model": model.state_dict(),
@@ -138,6 +141,7 @@ def training(model,trainDataload,testDataload,criterion,optimizer,args, epochs =
                 ) as json_file:
                     json.dump(best_result, json_file, indent="\t")
             else:
+                joblib.dump(model, os.path.join(model_save_path, "xbnet_cw.pkl"))
                 torch.save(
                     {
                         "model": model.state_dict(),

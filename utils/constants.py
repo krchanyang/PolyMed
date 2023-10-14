@@ -50,3 +50,8 @@ NORM_TABNET_MODEL_SAVE_PATH = "./experiments/norm/TabNet/{}"
 EXTEND_TABNET_MODEL_SAVE_PATH = "./experiments/extend/TabNet/{}"
 KB_EXTEND_TABNET_MODEL_SAVE_PATH = "./experiments/kb_extend/TabNet/{}"
 TABNET_SAVED_MODEL_NAME = "tabnet.pkl"
+
+NORM_XBNET_MODEL_SAVE_PATH = "./experiments/norm/XBNet/{}"
+EXTEND_XBNET_MODEL_SAVE_PATH = "./experiments/extend/XBNet/{}"
+KB_EXTEND_XBNET_MODEL_SAVE_PATH = "./experiments/kb_extend/XBNet/{}"
+XBNET_SAVED_MODEL_NAME = "xbnet.pkl"

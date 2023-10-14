@@ -52,17 +52,19 @@ class MLTestingRunner:
             )
         if self.train_data_type == "kb_extend":
             if self.class_weights:
+                model_saved_path = KB_EXTEND_CLASS_WEIGHTS_ML_MODEL_SAVE_PATH.format(self.augmentation_strategy)
                 ml_model_paths = sorted(
-                    glob(KB_EXTEND_CLASS_WEIGHTS_ML_MODEL_SAVE_PATH)
+                    glob(model_saved_path)
                 )
                 csv_save_path = os.path.join(
-                    KB_EXTEND_CLASS_WEIGHTS_ML_MODEL_SAVE_PATH.split("*")[0],
+                    model_saved_path.split("*")[0],
                     csv_save_name,
                 )
             else:
-                ml_model_paths = sorted(glob(KB_EXTEND_ML_MODEL_SAVE_PATH))
+                model_saved_path = KB_EXTEND_ML_MODEL_SAVE_PATH.format(self.augmentation_strategy)
+                ml_model_paths = sorted(glob(model_saved_path))
                 csv_save_path = os.path.join(
-                    KB_EXTEND_ML_MODEL_SAVE_PATH.split("*")[0], csv_save_name
+                    model_saved_path.split("*")[0], csv_save_name
                 )
 
         for path in ml_model_paths:

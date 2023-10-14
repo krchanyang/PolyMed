@@ -126,13 +126,13 @@ def training(model,trainDataload,testDataload,criterion,optimizer,args, epochs =
             if not args.class_weights:
                 joblib.dump(model, os.path.join(model_save_path, "xbnet.pkl"))
                 
-                torch.save(
-                    {
-                        "model": model.state_dict(),
-                        "optimizer": optimizer.state_dict(),
-                    },
-                    os.path.join(model_save_path, "xbnet.pt"),
-                )
+                # torch.save(
+                #     {
+                #         "model": model.state_dict(),
+                #         "optimizer": optimizer.state_dict(),
+                #     },
+                #     os.path.join(model_save_path, "xbnet.pt"),
+                # )
 
                 with open(
                     os.path.join(model_save_path, "best_results.json"),
@@ -142,13 +142,13 @@ def training(model,trainDataload,testDataload,criterion,optimizer,args, epochs =
                     json.dump(best_result, json_file, indent="\t")
             else:
                 joblib.dump(model, os.path.join(model_save_path, "xbnet_cw.pkl"))
-                torch.save(
-                    {
-                        "model": model.state_dict(),
-                        "optimizer": optimizer.state_dict(),
-                    },
-                    os.path.join(model_save_path, "xbnet_cw.pt"),
-                )
+                # torch.save(
+                #     {
+                #         "model": model.state_dict(),
+                #         "optimizer": optimizer.state_dict(),
+                #     },
+                #     os.path.join(model_save_path, "xbnet_cw.pt"),
+                # )
 
                 with open(
                     os.path.join(model_save_path, "best_results_cw.json"),

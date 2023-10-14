@@ -49,14 +49,15 @@ def main(args):
         train_x, train_y, graph = dataset.load_train_data()
     else:
         train_x, train_y = dataset.load_train_data()
-        if a_s is not None:
-            a_s = a_s.lower()
-            if a_s == "smote":
-                train_x, train_y = basic_SMOTE(train_x, train_y)
-            if a_s == "balance":
-                train_x, train_y = balance_SMOTE(train_x, train_y)
-            if a_s == "tomek":
-                train_x, train_y = basic_SMOTE_Tomek(train_x, train_y) 
+    if a_s is not None:
+        a_s = a_s.lower()
+        if a_s == "smote":
+            train_x, train_y = basic_SMOTE(train_x, train_y)
+        if a_s == "balance":
+            train_x, train_y = balance_SMOTE(train_x, train_y)
+        if a_s == "tomek":
+            train_x, train_y = basic_SMOTE_Tomek(train_x, train_y) 
+            
     test_x, test_y = dataset.load_test_data()
 
     print(f"train_x shape: {train_x.shape} | train_y.shape: {train_y.shape}")

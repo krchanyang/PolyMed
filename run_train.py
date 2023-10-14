@@ -71,8 +71,6 @@ def main(args):
         training_runner = MLPResNetTrainingRunner(
             train_x, train_y, test_x, test_y, word_idx_case, args, device
         )
-    if args.model_name.lower() == "xbnet":
-        training_runner = XBNetTrainingRunner(train_x, train_y, test_x, test_y, word_idx_case, args, device)
     if args.model_name.lower() == "tabnet":
         training_runner = TabNetTrainingRunner(train_x, train_y, test_x, test_y, word_idx_case, args, device)
     if args.model_name.lower() == "graphv1":

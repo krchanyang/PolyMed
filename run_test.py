@@ -5,6 +5,7 @@ from runners.testing.test_mlp import MLPTestingRunner
 from runners.testing.test_resnet import MLPResNetTestingRunner
 from runners.testing.test_graph_v1 import GraphV1TestingRunner
 from runners.testing.test_graph_v2 import GraphV2TestingRunner
+from runners.testing.test_tabnet import TabNetTestingRunner
 from utils.fix_seed import seed_everything
 import torch
 import os
@@ -60,6 +61,10 @@ def main(args):
             test_x, test_y, word_idx_case, args, device
         )
         testing_runner.test_resnet()
+    if args.model_name.lower() == "tabnet":
+        testing_runner = TabNetTestingRunner(test_x, test_y, word_idx_case, args, device)
+        testing_runner.test_tabnet()
+            
     if args.model_name.lower() == "graphv1":
         testing_runner = GraphV1TestingRunner(
             test_x,

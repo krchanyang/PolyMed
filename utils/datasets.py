@@ -46,7 +46,10 @@ class PolymedDataset:
         return train_x, train_y
 
     def load_test_data(self):
-        test_data = Training_data(self.polymed, "test")
+        if "graph" in self.model_name.lower():
+            test_data = Training_data(self.polymed, "test", "graph")
+        else:
+            test_data = Training_data(self.polymed, "test", "basic")
 
         if self.test_data_type == "single" or self.test_data_type is None:
             if self.train_data_type == "extend" or "norm":

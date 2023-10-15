@@ -37,7 +37,7 @@ class MLPResNetTestingRunner:
         resnet_mlp.to(self.device)
 
         csv_save_name = (
-            f"resnet__{self.train_data_type}_{self.augmentation_strategy}_{self.test_data_type}_result.csv"
+            f"resnet_{self.train_data_type}_{self.augmentation_strategy}_{self.test_data_type}_result.csv"
         )
 
         if self.train_data_type == "norm":

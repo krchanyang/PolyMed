@@ -54,7 +54,7 @@ class GraphV1TestingRunner:
         dc_output = len(self.word_idx_case)
 
         csv_save_name = (
-            f"graph_v1__{self.train_data_type}_{self.augmentation_strategy}_{self.test_data_type}_result.csv"
+            f"graph_v1_{self.train_data_type}_{self.augmentation_strategy}_{self.test_data_type}_result.csv"
         )
 
         if self.train_data_type == "extend":

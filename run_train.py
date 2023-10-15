@@ -106,6 +106,10 @@ def main(args):
             device,
         )
 
+    if args.model_name.lower() == "xbnet":
+        training_runner = XBNetTrainingRunner(train_x, train_y, test_x, test_y, word_idx_case, args, device)
+        
+    
     training_runner.train()
 
 

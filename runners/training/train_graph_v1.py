@@ -167,7 +167,7 @@ class GraphV1TrainingRunner:
                     best_result[f"precision_{k}"] = test_history[f"precision_{k}"][-1]
                     best_result[f"f1_{k}"] = test_history[f"f1_{k}"][-1]
                     best_result[f"ndcg_{k}"] = test_history[f"ndcg_{k}"][-1]
-                    
+
                 if not self.class_weights:
                     torch.save(
                         {

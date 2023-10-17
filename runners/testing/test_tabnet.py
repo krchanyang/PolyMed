@@ -29,20 +29,38 @@ class TabNetTestingRunner:
         csv_save_name = f"tabnet_{self.train_data_type}_{self.augmentation_strategy}_{self.test_data_type}_result.csv"
 
         if self.train_data_type == "norm":
-            tabnet = joblib.load(os.path.join(
-                NORM_TABNET_MODEL_SAVE_PATH.format(self.augmentation_strategy), TABNET_SAVED_MODEL_NAME
-            ))
-            csv_save_path = os.path.join(NORM_TABNET_MODEL_SAVE_PATH.format(self.augmentation_strategy), csv_save_name)
+            tabnet = joblib.load(
+                os.path.join(
+                    NORM_TABNET_MODEL_SAVE_PATH.format(self.augmentation_strategy),
+                    TABNET_SAVED_MODEL_NAME,
+                )
+            )
+            csv_save_path = os.path.join(
+                NORM_TABNET_MODEL_SAVE_PATH.format(self.augmentation_strategy),
+                csv_save_name,
+            )
         if self.train_data_type == "extend":
-            tabnet = joblib.load(os.path.join(
-                EXTEND_TABNET_MODEL_SAVE_PATH.format(self.augmentation_strategy), TABNET_SAVED_MODEL_NAME
-            ))
-            csv_save_path = os.path.join(EXTEND_TABNET_MODEL_SAVE_PATH.format(self.augmentation_strategy), csv_save_name)
+            tabnet = joblib.load(
+                os.path.join(
+                    EXTEND_TABNET_MODEL_SAVE_PATH.format(self.augmentation_strategy),
+                    TABNET_SAVED_MODEL_NAME,
+                )
+            )
+            csv_save_path = os.path.join(
+                EXTEND_TABNET_MODEL_SAVE_PATH.format(self.augmentation_strategy),
+                csv_save_name,
+            )
         if self.train_data_type == "kb_extend":
-            tabnet = joblib.load(os.path.join(
-                KB_EXTEND_TABNET_MODEL_SAVE_PATH.format(self.augmentation_strategy), TABNET_SAVED_MODEL_NAME
-            ))
-            csv_save_path = os.path.join(KB_EXTEND_TABNET_MODEL_SAVE_PATH.format(self.augmentation_strategy), csv_save_name)
+            tabnet = joblib.load(
+                os.path.join(
+                    KB_EXTEND_TABNET_MODEL_SAVE_PATH.format(self.augmentation_strategy),
+                    TABNET_SAVED_MODEL_NAME,
+                )
+            )
+            csv_save_path = os.path.join(
+                KB_EXTEND_TABNET_MODEL_SAVE_PATH.format(self.augmentation_strategy),
+                csv_save_name,
+            )
 
         # Test
         test_pred = tabnet.predict_proba(self.test_x)

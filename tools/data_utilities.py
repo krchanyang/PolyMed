@@ -832,7 +832,7 @@ class Training_data:
 
     graph = None
 
-    def __init__(self, polymed, t_type, m_type = "basic"):
+    def __init__(self, polymed, t_type, m_type="basic"):
         if t_type == "train":
             self.__load_train_data(polymed)
             self.__load_test_data(polymed)
@@ -917,7 +917,7 @@ class Training_data:
 
     def __load_graph_data(self, polymed):
         import dgl
-        
+
         print("Graph data load...", end="")
         src, dst = Data_preprocessing.get_kb_relation(
             polymed.org_kb_data, polymed.data_variable.word_idx_allkb

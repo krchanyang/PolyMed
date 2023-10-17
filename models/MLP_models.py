@@ -1,8 +1,5 @@
 import torch
 import torch.nn as nn
-import time
-import pickle
-import tqdm
 
 
 class Disease_classifier(nn.Module):
@@ -17,6 +14,7 @@ class Disease_classifier(nn.Module):
             nn.ReLU(),
             nn.Linear(128, output_size),
         )
+
     def forward(self, x):
         h = self.layer1(x)
         return h

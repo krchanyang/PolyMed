@@ -21,25 +21,27 @@ import requests
 from kivy.uix.popup import Popup
 import os
 from xgboost import XGBClassifier
-from  sklearn.ensemble import  RandomForestClassifier
-from sklearn.tree import  DecisionTreeClassifier
-from lightgbm import  LGBMClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier
+from lightgbm import LGBMClassifier
 import torch
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
-from XBNet.training_utils import training,predict
+from XBNet.training_utils import training, predict
 from XBNet.models import XBNETClassifier
 from XBNet.run import run_XBNET
 from os import environ
 import pickle
+
 
 def suppress_qt_warnings():
     environ["QT_DEVICE_PIXEL_RATIO"] = "0"
     environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
     environ["QT_SCREEN_SCALE_FACTORS"] = "1"
     environ["QT_SCALE_FACTOR"] = "1"
+
 
 Login_Page = """
 ScreenManager:
@@ -141,25 +143,30 @@ ScreenManager:
     
             """
 
+
 class LoginPage(Screen):
     pass
+
 
 class ModelDetails(Screen):
     pass
 
+
 class CustomDropDown(BoxLayout):
     pass
 
+
 class FileManage(Screen):
     pass
+
 
 sm = ScreenManager()
 sm.add_widget(LoginPage(name="Login"))
 sm.add_widget(ModelDetails(name="Model"))
 sm.add_widget(FileManage(name="File"))
 
-class XBNetGUI(MDApp):
 
+class XBNetGUI(MDApp):
     def __init__(self):
         super(XBNetGUI, self).__init__()
         self.predict_phase = False
@@ -179,12 +186,16 @@ class XBNetGUI(MDApp):
     def get_layers(self):
         self.layers_dims = []
         if self.model == "xbnet" or self.model == "neural network":
-            for i,j in self.fields.items():
+            for i, j in self.fields.items():
                 self.layers_dims.append(int(j.text))
                 print(j.text)
-        elif (self.model == "xgboost" or self.model == "randomforest"
-            or self.model == "decision tree" or self.model == "lightgbm"):
-            for i,j in self.fields.items():
+        elif (
+            self.model == "xgboost"
+            or self.model == "randomforest"
+            or self.model == "decision tree"
+            or self.model == "lightgbm"
+        ):
+            for i, j in self.fields.items():
                 try:
                     self.layers_dims.append(int(j.text))
                 except:
@@ -203,7 +214,10 @@ class XBNetGUI(MDApp):
             imputations[i] = data[i].mode()
             if data[i].isnull().sum() / n_df >= 0.15:
                 data.drop(i, axis=1, inplace=True)
-            elif data[i].isnull().sum() / n_df < 0.15 and data[i].isnull().sum() / n_df > 0:
+            elif (
+                data[i].isnull().sum() / n_df < 0.15
+                and data[i].isnull().sum() / n_df > 0
+            ):
                 data[i].fillna(data[i].mode(), inplace=True)
                 imputations[i] = data[i].mode()
         columns_object = list(data.dtypes[data.dtypes == object].index)
@@ -227,70 +241,121 @@ class XBNetGUI(MDApp):
             y_data = self.y_label_encoder.fit_transform(y_data)
         self.label_encoded = label_encoded
         self.imputations = imputations
-        toast("Number of features are: " + str(x_data.shape[1]) +
-                                " classes are: "+ str(len(np.unique(y_data))),duration=5)
+        toast(
+            "Number of features are: "
+            + str(x_data.shape[1])
+            + " classes are: "
+            + str(len(np.unique(y_data))),
+            duration=5,
+        )
         self.x_data = x_data
         self.y_data = y_data
 
     def train(self):
-        X_train, X_test, y_train, y_test = train_test_split(self.x_data, self.y_data,
-                                                            test_size=0.3, random_state=0)
-        if self.model == "xbnet" or self.model =="neural network":
+        X_train, X_test, y_train, y_test = train_test_split(
+            self.x_data, self.y_data, test_size=0.3, random_state=0
+        )
+        if self.model == "xbnet" or self.model == "neural network":
             print(self.layers_dims)
             m = self.model
-            model = XBNETClassifier( X_train, y_train, self.layers,
-                                    input_through_cmd=True, inputs_for_gui=self.layers_dims,
-                                     num_layers_boosted=self.n_layers_boosted
-                                    )
+            model = XBNETClassifier(
+                X_train,
+                y_train,
+                self.layers,
+                input_through_cmd=True,
+                inputs_for_gui=self.layers_dims,
+                num_layers_boosted=self.n_layers_boosted,
+            )
             criterion = torch.nn.CrossEntropyLoss()
             optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 
-            self.model, self.acc, self.lo, self.val_ac, self.val_lo = run_XBNET(X_train, X_test, y_train, y_test, model, criterion, optimizer, 32, 10)
-            model.save(m+"_testAccuracy_" +str(max(self.val_ac))[:4] +"_trainAccuracy_" +
-                                        str(max(self.acc))[:4]+ ".pt",)
-            toast("Test Accuracy is: " +str(max(self.val_ac))[:4] +" and Training Accuracy is: " +
-                        str(max(self.acc))[:4] + " and model is saved.",duration= 10)
+            self.model, self.acc, self.lo, self.val_ac, self.val_lo = run_XBNET(
+                X_train, X_test, y_train, y_test, model, criterion, optimizer, 32, 10
+            )
+            model.save(
+                m
+                + "_testAccuracy_"
+                + str(max(self.val_ac))[:4]
+                + "_trainAccuracy_"
+                + str(max(self.acc))[:4]
+                + ".pt",
+            )
+            toast(
+                "Test Accuracy is: "
+                + str(max(self.val_ac))[:4]
+                + " and Training Accuracy is: "
+                + str(max(self.acc))[:4]
+                + " and model is saved.",
+                duration=10,
+            )
 
-        elif (self.model == "xgboost" or self.model == "randomforest"
-            or self.model == "decision tree" or self.model == "lightgbm"):
+        elif (
+            self.model == "xgboost"
+            or self.model == "randomforest"
+            or self.model == "decision tree"
+            or self.model == "lightgbm"
+        ):
             if self.model == "xgboost":
-                self.model_tree = XGBClassifier(n_estimators=self.layers_dims[0],
-                                      max_depth=self.layers_dims[1],
-                                      learning_rate= self.layers_dims[2],
-                                      subsample= self.layers_dims[3],
-                                      colsample_bylevel = self.layers_dims[4],
-                                      random_state=0,n_jobs=-1,
-                                      )
-                self.model_tree.fit(X_train, y_train,eval_metric="mlogloss")
+                self.model_tree = XGBClassifier(
+                    n_estimators=self.layers_dims[0],
+                    max_depth=self.layers_dims[1],
+                    learning_rate=self.layers_dims[2],
+                    subsample=self.layers_dims[3],
+                    colsample_bylevel=self.layers_dims[4],
+                    random_state=0,
+                    n_jobs=-1,
+                )
+                self.model_tree.fit(X_train, y_train, eval_metric="mlogloss")
                 training_acc = self.model_tree.score(X_train, y_train)
-                testing_acc = self.model_tree.score(X_test,y_test)
+                testing_acc = self.model_tree.score(X_test, y_test)
             elif self.model == "randomforest":
-                self.model_tree = RandomForestClassifier(n_estimators=self.layers_dims[0],
-                                               max_depth=self.layers_dims[1],
-                                               random_state=0,n_jobs=-1)
+                self.model_tree = RandomForestClassifier(
+                    n_estimators=self.layers_dims[0],
+                    max_depth=self.layers_dims[1],
+                    random_state=0,
+                    n_jobs=-1,
+                )
                 self.model_tree.fit(X_train, y_train)
                 training_acc = self.model_tree.score(X_train, y_train)
-                testing_acc = self.model_tree.score(X_test,y_test)
+                testing_acc = self.model_tree.score(X_test, y_test)
             elif self.model == "decision tree":
-                self.model_tree = DecisionTreeClassifier(max_depth=self.layers_dims[1],random_state=0)
+                self.model_tree = DecisionTreeClassifier(
+                    max_depth=self.layers_dims[1], random_state=0
+                )
                 self.model_tree.fit(X_train, y_train)
                 training_acc = self.model_tree.score(X_train, y_train)
-                testing_acc = self.model_tree.score(X_test,y_test)
+                testing_acc = self.model_tree.score(X_test, y_test)
             elif self.model == "lightgbm":
-                self.model_tree = LGBMClassifier(n_estimators=self.layers_dims[0],
-                                      max_depth=self.layers_dims[1],
-                                      learning_rate= self.layers_dims[2],
-                                      subsample= self.layers_dims[3],
-                                      colsample_bylevel = self.layers_dims[4],
-                                      random_state=0,n_jobs=-1,)
-                self.model_tree.fit(X_train, y_train,eval_metric="mlogloss")
+                self.model_tree = LGBMClassifier(
+                    n_estimators=self.layers_dims[0],
+                    max_depth=self.layers_dims[1],
+                    learning_rate=self.layers_dims[2],
+                    subsample=self.layers_dims[3],
+                    colsample_bylevel=self.layers_dims[4],
+                    random_state=0,
+                    n_jobs=-1,
+                )
+                self.model_tree.fit(X_train, y_train, eval_metric="mlogloss")
                 training_acc = self.model_tree.score(X_train, y_train)
-                testing_acc = self.model_tree.score(X_test,y_test)
-            toast(text="Training and Testing accuracies are "+str(training_acc*100)
-                           +" "+str(testing_acc*100) + " respectively and model is stored",duration=7)
-            with open(self.model+"_testAccuracy_" +str(testing_acc)[:4] +"_trainAccuracy_" +
-                                        str(training_acc)[:4]+ ".pkl", 'wb') as outfile:
-                pickle.dump(self.model_tree,outfile)
+                testing_acc = self.model_tree.score(X_test, y_test)
+            toast(
+                text="Training and Testing accuracies are "
+                + str(training_acc * 100)
+                + " "
+                + str(testing_acc * 100)
+                + " respectively and model is stored",
+                duration=7,
+            )
+            with open(
+                self.model
+                + "_testAccuracy_"
+                + str(testing_acc)[:4]
+                + "_trainAccuracy_"
+                + str(training_acc)[:4]
+                + ".pkl",
+                "wb",
+            ) as outfile:
+                pickle.dump(self.model_tree, outfile)
 
     def predict(self):
         self.predict_phase = True
@@ -304,8 +369,12 @@ class XBNetGUI(MDApp):
                 data[i].fillna(self.imputations[i], inplace=True)
             if i in self.label_encoded.keys():
                 data[i] = self.label_encoded[i].transform(data[i])
-        if (self.model == "xgboost" or self.model == "randomforest"
-            or self.model == "decision tree" or self.model == "lightgbm"):
+        if (
+            self.model == "xgboost"
+            or self.model == "randomforest"
+            or self.model == "decision tree"
+            or self.model == "lightgbm"
+        ):
             predictions = self.model_tree.predict(data.to_numpy())
         else:
             predictions = predict(self.model, data.to_numpy())
@@ -313,12 +382,12 @@ class XBNetGUI(MDApp):
                 df[self.target] = self.y_label_encoder.inverse_transform(predictions)
             else:
                 df[self.target] = predictions
-        df.to_csv("Predicted_Results.csv",index=False)
-        toast(text="Predicted_Results.csv in this directory has the results",
-                           duration = 10)
+        df.to_csv("Predicted_Results.csv", index=False)
+        toast(
+            text="Predicted_Results.csv in this directory has the results", duration=10
+        )
 
-
-    def get_model(self,model,target,layers):
+    def get_model(self, model, target, layers):
         self.model = model.lower()
         if len(layers) > 0:
             self.layers = int(layers)
@@ -326,8 +395,12 @@ class XBNetGUI(MDApp):
         if self.model.lower() == "xbnet":
             self.n_layers_boosted = 1
             self.net_model()
-        elif (self.model == "xgboost" or self.model == "randomforest"
-            or self.model == "decision tree" or self.model == "lightgbm"):
+        elif (
+            self.model == "xgboost"
+            or self.model == "randomforest"
+            or self.model == "decision tree"
+            or self.model == "lightgbm"
+        ):
             self.tree_model()
         elif self.model.lower() == "neural network":
             self.n_layers_boosted = 0
@@ -336,47 +409,68 @@ class XBNetGUI(MDApp):
         self.process_input()
 
     def net_model(self):
-        layout = self.root.get_screen('Model')
-        gap = 1/(2*self.layers+2)
+        layout = self.root.get_screen("Model")
+        gap = 1 / (2 * self.layers + 2)
         counter = 1
         self.fields = {}
         for i in range(self.layers):
-                lab1 = MDTextField(hint_text="Enter input dimensions of layer "+ str(i+1) +":",
-                                   pos_hint={"center_x":0.77,"center_y":1-gap*(counter)},
-                                    size_hint_x=.4, current_hint_text_color=[0,0,0,1] )
+            lab1 = MDTextField(
+                hint_text="Enter input dimensions of layer " + str(i + 1) + ":",
+                pos_hint={"center_x": 0.77, "center_y": 1 - gap * (counter)},
+                size_hint_x=0.4,
+                current_hint_text_color=[0, 0, 0, 1],
+            )
 
-                counter+=1
-                lab2 = MDTextField(hint_text="Enter output dimensions of layer "+ str(i+1) +":",
-                                   pos_hint={"center_x":0.77,"center_y":1-gap*(counter)},
-                                   size_hint_x=.4, current_hint_text_color=[0,0,0,1] )
-                counter +=1
-                layout.add_widget(lab1)
-                layout.add_widget(lab2)
-                self.fields["input_"+str(i+1)] = lab1
-                self.fields["output_" + str(i+1)] = lab2
+            counter += 1
+            lab2 = MDTextField(
+                hint_text="Enter output dimensions of layer " + str(i + 1) + ":",
+                pos_hint={"center_x": 0.77, "center_y": 1 - gap * (counter)},
+                size_hint_x=0.4,
+                current_hint_text_color=[0, 0, 0, 1],
+            )
+            counter += 1
+            layout.add_widget(lab1)
+            layout.add_widget(lab2)
+            self.fields["input_" + str(i + 1)] = lab1
+            self.fields["output_" + str(i + 1)] = lab2
 
     def tree_model(self):
-        layout = self.root.get_screen('Model')
+        layout = self.root.get_screen("Model")
         self.fields = {}
-        lab1 = MDTextField(hint_text="Enter number of estimators: ",
-                           pos_hint={"center_x":0.77,"center_y":0.85},
-                            size_hint_x=.4, current_hint_text_color=[0,0,0,1] )
+        lab1 = MDTextField(
+            hint_text="Enter number of estimators: ",
+            pos_hint={"center_x": 0.77, "center_y": 0.85},
+            size_hint_x=0.4,
+            current_hint_text_color=[0, 0, 0, 1],
+        )
 
-        lab2 = MDTextField(hint_text="Enter depth of trees[default:6](Typical 3-10): ",
-                           pos_hint={"center_x":0.77,"center_y":0.7},
-                           size_hint_x=.4, current_hint_text_color=[0,0,0,1] )
+        lab2 = MDTextField(
+            hint_text="Enter depth of trees[default:6](Typical 3-10): ",
+            pos_hint={"center_x": 0.77, "center_y": 0.7},
+            size_hint_x=0.4,
+            current_hint_text_color=[0, 0, 0, 1],
+        )
 
-        lab3 = MDTextField(hint_text="Enter learning rate forr XGBoost(eta)[default:0.3]: ",
-                           pos_hint={"center_x":0.77,"center_y":0.55},
-                            size_hint_x=.4, current_hint_text_color=[0,0,0,1] )
+        lab3 = MDTextField(
+            hint_text="Enter learning rate forr XGBoost(eta)[default:0.3]: ",
+            pos_hint={"center_x": 0.77, "center_y": 0.55},
+            size_hint_x=0.4,
+            current_hint_text_color=[0, 0, 0, 1],
+        )
 
-        lab4 = MDTextField(hint_text="Enter size of subsample[default:1](Typical 0.5-1): ",
-                           pos_hint={"center_x":0.77,"center_y":0.4},
-                            size_hint_x=.4, current_hint_text_color=[0,0,0,1] )
+        lab4 = MDTextField(
+            hint_text="Enter size of subsample[default:1](Typical 0.5-1): ",
+            pos_hint={"center_x": 0.77, "center_y": 0.4},
+            size_hint_x=0.4,
+            current_hint_text_color=[0, 0, 0, 1],
+        )
 
-        lab5 = MDTextField(hint_text="Enter size of colsample_bytree[default:1](Typical 0.5-1): ",
-                           pos_hint={"center_x":0.77,"center_y":0.25},
-                            size_hint_x=.4, current_hint_text_color=[0,0,0,1] )
+        lab5 = MDTextField(
+            hint_text="Enter size of colsample_bytree[default:1](Typical 0.5-1): ",
+            pos_hint={"center_x": 0.77, "center_y": 0.25},
+            size_hint_x=0.4,
+            current_hint_text_color=[0, 0, 0, 1],
+        )
 
         layout.add_widget(lab1)
         layout.add_widget(lab2)
@@ -389,7 +483,7 @@ class XBNetGUI(MDApp):
         self.fields["subsample"] = lab4
         self.fields["colsample_bytree"] = lab5
 
-    def get_path(self,*args):
+    def get_path(self, *args):
         print(args)
         self.file_selected = args[1][0]
         print(self.file_selected)
@@ -399,6 +493,7 @@ class XBNetGUI(MDApp):
             self.predict_results()
         else:
             self.root.current = "Login"
+
 
 if __name__ == "__main__":
     XBNetGUI().run()

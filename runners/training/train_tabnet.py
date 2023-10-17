@@ -1,12 +1,8 @@
 import joblib
-import torch
 import os
-import numpy as np
-import pandas as pd
-from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
-from pytorch_tabnet.tab_model import TabNetClassifier, TabNetRegressor
-from collections import Counter
+from pytorch_tabnet.tab_model import TabNetClassifier
+
 
 class TabNetTrainingRunner:
     def __init__(self, train_x, train_y, test_x, test_y, word_idx_case, args, device):
@@ -33,12 +29,9 @@ class TabNetTrainingRunner:
         test_x = self.test_x
         test_y = self.test_y
 
-        clf = TabNetClassifier()  # TabNetRegressor()
+        clf = TabNetClassifier() 
         clf.fit(
-            train_x, train_y,
-            max_epochs=1000,
-            patience=300,
-            eval_set=[(test_x, test_y)]
+            train_x, train_y, max_epochs=1000, patience=300, eval_set=[(test_x, test_y)]
         )
 
         joblib.dump(clf, os.path.join(model_save_path, "tabnet.pkl"))

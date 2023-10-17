@@ -44,7 +44,7 @@ def main(args):
     )
     a_s = args.augmentation_strategy
     print(f"Augmentation Strategy: {a_s}")
-    
+
     if "graph" in args.model_name.lower():
         train_x, train_y, graph = dataset.load_train_data()
     else:
@@ -56,8 +56,8 @@ def main(args):
         if a_s == "balance":
             train_x, train_y = balance_SMOTE(train_x, train_y)
         if a_s == "tomek":
-            train_x, train_y = basic_SMOTE_Tomek(train_x, train_y) 
-            
+            train_x, train_y = basic_SMOTE_Tomek(train_x, train_y)
+
     test_x, test_y = dataset.load_test_data()
 
     print(f"train_x shape: {train_x.shape} | train_y.shape: {train_y.shape}")
@@ -73,7 +73,9 @@ def main(args):
             train_x, train_y, test_x, test_y, word_idx_case, args, device
         )
     if args.model_name.lower() == "tabnet":
-        training_runner = TabNetTrainingRunner(train_x, train_y, test_x, test_y, word_idx_case, args, device)
+        training_runner = TabNetTrainingRunner(
+            train_x, train_y, test_x, test_y, word_idx_case, args, device
+        )
     if args.model_name.lower() == "graphv1":
         training_runner = GraphV1TrainingRunner(
             train_x,
@@ -105,11 +107,10 @@ def main(args):
             args,
             device,
         )
-
     if args.model_name.lower() == "xbnet":
-        training_runner = XBNetTrainingRunner(train_x, train_y, test_x, test_y, word_idx_case, args, device)
-        
-    
+        training_runner = XBNetTrainingRunner(
+            train_x, train_y, test_x, test_y, word_idx_case, args, device
+        )
     training_runner.train()
 
 
@@ -187,7 +188,9 @@ if __name__ == "__main__":
         "--augmentation_strategy",
         type=str,
         help="Train data augmentation strategies. Supports None, SMOTE, Balance, and Tomek. The default is None.",
-        default=None)
+        default=None,
+    )
+    
     args = parser.parse_args()
 
     main(args)

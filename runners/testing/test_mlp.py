@@ -37,19 +37,31 @@ class MLPTestingRunner:
 
         if self.train_data_type == "norm":
             model_saved_path = os.path.join(
-                NORM_MLP_MODEL_SAVE_PATH.format(self.augmentation_strategy), MLP_SAVED_MODEL_NAME
+                NORM_MLP_MODEL_SAVE_PATH.format(self.augmentation_strategy),
+                MLP_SAVED_MODEL_NAME,
             )
-            csv_save_path = os.path.join(NORM_MLP_MODEL_SAVE_PATH.format(self.augmentation_strategy), csv_save_name)
+            csv_save_path = os.path.join(
+                NORM_MLP_MODEL_SAVE_PATH.format(self.augmentation_strategy),
+                csv_save_name,
+            )
         if self.train_data_type == "extend":
             model_saved_path = os.path.join(
-                EXTEND_MLP_MODEL_SAVE_PATH.format(self.augmentation_strategy), MLP_SAVED_MODEL_NAME
+                EXTEND_MLP_MODEL_SAVE_PATH.format(self.augmentation_strategy),
+                MLP_SAVED_MODEL_NAME,
             )
-            csv_save_path = os.path.join(EXTEND_MLP_MODEL_SAVE_PATH.format(self.augmentation_strategy), csv_save_name)
+            csv_save_path = os.path.join(
+                EXTEND_MLP_MODEL_SAVE_PATH.format(self.augmentation_strategy),
+                csv_save_name,
+            )
         if self.train_data_type == "kb_extend":
             model_saved_path = os.path.join(
-                KB_EXTEND_MLP_MODEL_SAVE_PATH.format(self.augmentation_strategy), MLP_SAVED_MODEL_NAME
+                KB_EXTEND_MLP_MODEL_SAVE_PATH.format(self.augmentation_strategy),
+                MLP_SAVED_MODEL_NAME,
             )
-            csv_save_path = os.path.join(KB_EXTEND_MLP_MODEL_SAVE_PATH.format(self.augmentation_strategy), csv_save_name)
+            csv_save_path = os.path.join(
+                KB_EXTEND_MLP_MODEL_SAVE_PATH.format(self.augmentation_strategy),
+                csv_save_name,
+            )
 
         params = torch.load(model_saved_path, map_location=self.device)
         simple_mlp.load_state_dict(params["model"])

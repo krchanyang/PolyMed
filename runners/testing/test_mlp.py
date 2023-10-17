@@ -20,6 +20,7 @@ class MLPTestingRunner:
         self.k = args.k
         self.train_data_type = args.train_data_type
         self.test_data_type = args.test_data_type
+        self.augmentation_strategy = args.augmentation_strategy
         self.device = device
 
     def test_mlp(self):
@@ -32,23 +33,23 @@ class MLPTestingRunner:
         )
         simple_mlp = simple_mlp.to(self.device)
 
-        csv_save_name = f"mlp_{self.train_data_type}_{self.test_data_type}_result.csv"
+        csv_save_name = f"mlp_{self.train_data_type}_{self.augmentation_strategy}_{self.test_data_type}_result.csv"
 
         if self.train_data_type == "norm":
             model_saved_path = os.path.join(
-                NORM_MLP_MODEL_SAVE_PATH, MLP_SAVED_MODEL_NAME
+                NORM_MLP_MODEL_SAVE_PATH.format(self.augmentation_strategy), MLP_SAVED_MODEL_NAME
             )
-            csv_save_path = os.path.join(NORM_MLP_MODEL_SAVE_PATH, csv_save_name)
+            csv_save_path = os.path.join(NORM_MLP_MODEL_SAVE_PATH.format(self.augmentation_strategy), csv_save_name)
         if self.train_data_type == "extend":
             model_saved_path = os.path.join(
-                EXTEND_MLP_MODEL_SAVE_PATH, MLP_SAVED_MODEL_NAME
+                EXTEND_MLP_MODEL_SAVE_PATH.format(self.augmentation_strategy), MLP_SAVED_MODEL_NAME
             )
-            csv_save_path = os.path.join(EXTEND_MLP_MODEL_SAVE_PATH, csv_save_name)
+            csv_save_path = os.path.join(EXTEND_MLP_MODEL_SAVE_PATH.format(self.augmentation_strategy), csv_save_name)
         if self.train_data_type == "kb_extend":
             model_saved_path = os.path.join(
-                KB_EXTEND_MLP_MODEL_SAVE_PATH, MLP_SAVED_MODEL_NAME
+                KB_EXTEND_MLP_MODEL_SAVE_PATH.format(self.augmentation_strategy), MLP_SAVED_MODEL_NAME
             )
-            csv_save_path = os.path.join(KB_EXTEND_MLP_MODEL_SAVE_PATH, csv_save_name)
+            csv_save_path = os.path.join(KB_EXTEND_MLP_MODEL_SAVE_PATH.format(self.augmentation_strategy), csv_save_name)
 
         params = torch.load(model_saved_path, map_location=self.device)
         simple_mlp.load_state_dict(params["model"])

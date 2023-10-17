@@ -41,6 +41,7 @@ class GraphV1TestingRunner:
         self.train_data_type = args.train_data_type
         self.test_data_type = args.test_data_type
         self.k = args.k
+        self.augmentation_strategy = args.augmentation_strategy
 
     def test_graph_mlp_v1(self):
         print("Graph MLP v1 Evaluation Start...")
@@ -53,20 +54,20 @@ class GraphV1TestingRunner:
         dc_output = len(self.word_idx_case)
 
         csv_save_name = (
-            f"graph_v1_{self.train_data_type}_{self.test_data_type}_result.csv"
+            f"graph_v1__{self.train_data_type}_{self.augmentation_strategy}_{self.test_data_type}_result.csv"
         )
 
         if self.train_data_type == "extend":
             model_saved_path = os.path.join(
-                EXTEND_GRAPH_V1_MODEL_SAVE_PATH, GRAPH_V1_SAVED_MODEL_NAME
+                EXTEND_GRAPH_V1_MODEL_SAVE_PATH.format(self.augmentation_strategy), GRAPH_V1_SAVED_MODEL_NAME
             )
-            csv_save_path = os.path.join(EXTEND_GRAPH_V1_MODEL_SAVE_PATH, csv_save_name)
+            csv_save_path = os.path.join(EXTEND_GRAPH_V1_MODEL_SAVE_PATH.format(self.augmentation_strategy), csv_save_name)
         if self.train_data_type == "kb_extend":
             model_saved_path = os.path.join(
-                KB_EXTEND_GRAPH_V1_MODEL_SAVE_PATH, GRAPH_V1_SAVED_MODEL_NAME
+                KB_EXTEND_GRAPH_V1_MODEL_SAVE_PATH.format(self.augmentation_strategy), GRAPH_V1_SAVED_MODEL_NAME
             )
             csv_save_path = os.path.join(
-                KB_EXTEND_GRAPH_V1_MODEL_SAVE_PATH, csv_save_name
+                KB_EXTEND_GRAPH_V1_MODEL_SAVE_PATH.format(self.augmentation_strategy), csv_save_name
             )
 
         test_x = torch.tensor(self.test_x).type(torch.FloatTensor).to(self.device)

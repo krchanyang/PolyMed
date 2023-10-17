@@ -18,11 +18,14 @@ class TabNetTrainingRunner:
         self.word_idx_case = word_idx_case
         self.class_weights = args.class_weights
         self.k = args.k
+        self.augmentation_strategy = args.augmentation_strategy
         self.save_base_path = os.path.join(args.save_base_path, args.train_data_type)
 
     def train(self):
         print("TabNet Training Start...")
         model_save_path = os.path.join(self.save_base_path, "TabNet")
+        model_save_path = os.path.join(model_save_path, str(self.augmentation_strategy))
+
         os.makedirs(model_save_path, exist_ok=True)
 
         train_x = self.train_x

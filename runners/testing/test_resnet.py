@@ -21,6 +21,7 @@ class MLPResNetTestingRunner:
         self.k = args.k
         self.train_data_type = args.train_data_type
         self.test_data_type = args.test_data_type
+        self.augmentation_strategy = args.augmentation_strategy
         self.device = device
 
     def test_resnet(self):
@@ -36,25 +37,25 @@ class MLPResNetTestingRunner:
         resnet_mlp.to(self.device)
 
         csv_save_name = (
-            f"resnet_{self.train_data_type}_{self.test_data_type}_result.csv"
+            f"resnet__{self.train_data_type}_{self.augmentation_strategy}_{self.test_data_type}_result.csv"
         )
 
         if self.train_data_type == "norm":
             model_saved_path = os.path.join(
-                NORM_RESNET_MODEL_SAVE_PATH, RESNET_SAVED_MODEL_NAME
+                NORM_RESNET_MODEL_SAVE_PATH.format(self.augmentation_strategy), RESNET_SAVED_MODEL_NAME
             )
-            csv_save_path = os.path.join(NORM_RESNET_MODEL_SAVE_PATH, csv_save_name)
+            csv_save_path = os.path.join(NORM_RESNET_MODEL_SAVE_PATH.format(self.augmentation_strategy), csv_save_name)
         if self.train_data_type == "extend":
             model_saved_path = os.path.join(
-                EXTEND_RESNET_MODEL_SAVE_PATH, RESNET_SAVED_MODEL_NAME
+                EXTEND_RESNET_MODEL_SAVE_PATH.format(self.augmentation_strategy), RESNET_SAVED_MODEL_NAME
             )
-            csv_save_path = os.path.join(EXTEND_RESNET_MODEL_SAVE_PATH, csv_save_name)
+            csv_save_path = os.path.join(EXTEND_RESNET_MODEL_SAVE_PATH.format(self.augmentation_strategy), csv_save_name)
         if self.train_data_type == "kb_extend":
             model_saved_path = os.path.join(
-                KB_EXTEND_RESNET_MODEL_SAVE_PATH, RESNET_SAVED_MODEL_NAME
+                KB_EXTEND_RESNET_MODEL_SAVE_PATH.format(self.augmentation_strategy), RESNET_SAVED_MODEL_NAME
             )
             csv_save_path = os.path.join(
-                KB_EXTEND_RESNET_MODEL_SAVE_PATH, csv_save_name
+                KB_EXTEND_RESNET_MODEL_SAVE_PATH.format(self.augmentation_strategy), csv_save_name
             )
 
         params = torch.load(model_saved_path, map_location=self.device)

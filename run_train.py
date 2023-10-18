@@ -190,7 +190,7 @@ if __name__ == "__main__":
         help="Train data augmentation strategies. Supports None, SMOTE, Balance, and Tomek. The default is None.",
         default=None,
     )
-    
+
     args = parser.parse_args()
 
     main(args)

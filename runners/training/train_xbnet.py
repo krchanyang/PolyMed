@@ -63,4 +63,3 @@ class XBNetTrainingRunner:
             batch_size=512,
             epochs=300,
         )
-        

@@ -29,7 +29,7 @@ class TabNetTrainingRunner:
         test_x = self.test_x
         test_y = self.test_y
 
-        clf = TabNetClassifier() 
+        clf = TabNetClassifier()
         clf.fit(
             train_x, train_y, max_epochs=1000, patience=300, eval_set=[(test_x, test_y)]
         )

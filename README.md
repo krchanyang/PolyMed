@@ -15,8 +15,20 @@ repo
   |——data_stat
   |——experiments
     |——extend
+      |——None
+      |——SMOTE
+      |——Balance
+      |——Tomek
     |——kb_extend
+      |——None
+      |——SMOTE
+      |——Balance
+      |——Tomek
     |——norm
+      |——None
+      |——SMOTE
+      |——Balance
+      |——Tomek
   |——models
   |——runners
     |——training
@@ -35,16 +47,29 @@ Download and extract these files to the following location:<br>
 It is important to follow the file structure provided to ensure that the models can access the necessary data and weights during training and testing.
 ***
 
-## Docker Image (Option 1)
+## Docker (Option 1)
 ```shell
-docker pull kimjonghyeon/polymed
+# From image
+docker pull kimjonghyeon/polymed_final
 ```
+### 1. Create Container with Docker Image
+```shell
+docker run -it -v {$your_path}/PolyMed:/home/PolyMed --name "polymed" --gpus "device=0" kimjonghyeon/polymed_final
+```
+### 2. Change Directory
+```shell
+$ cd /home/PolyMed
+```  
 
-1. Create Container with Local Repository
 ```shell
-docker run -it -v {$your_path}/PolyMed:/home/PolyMed --name "polymed" --gpus "device=0" kimjonghyeon/polymed
+# From Dockerfile
+docker build -t polymed_final .
 ```
-2. Change Directory
+### 1. Create Container with Dockerfile Image
+```shell
+docker run -it -v {$your_path}/PolyMed:/home/PolyMed --name "polymed" --gpus "device=0" polymed_final
+```
+### 2. Change Directory
 ```shell
 $ cd /home/PolyMed
 ```
@@ -52,19 +77,18 @@ $ cd /home/PolyMed
 ## Anaconda Environment (Option 2)
 [![Python 3.8](https://img.shields.io/badge/python-3.8-blue.svg)](https://www.python.org/downloads/release/python-3812/)
 
-1. Create Anaconda Environment
+### 1. Create Anaconda Environment
 ```shell
-conda env -n PolyMed python==3.8.5
+conda create -n PolyMed python=3.8.5
 ```
-2. Activate Created Environment
+### 2. Activate Created Environment
 ```shell
 conda activate PolyMed
 ```
-3. Install Requirements (CUDA 11.8)
+### 3. Install Requirements (CUDA 11.8)
 ```shell
-pip install -r requirements.txt
+pip install -r requirements.txt --no_dependencies
 ```
-
 ## Simple Exploratory Data Analysis (EDA)
 ```shell
 python run_data_stat.py
@@ -74,14 +98,14 @@ After run this code, the figure of data statistics saved at ``./data_stat``.
 ## Train
 Download the PolyMed and place in **data** folder:
 ```shell
-python run_train.py \
+CUDA_VISIBLE_DEVICES=0 python run_train.py \
 --data_type "extend" \
 --train_data_type "kb_extend" \
 --class_weights "True" \
 --save_base_path "./experiments" \
 --model_name "ML" \
---device 0 \
---seed 42
+--seed 42 \
+--augmentation_strategy "SMOTE"
 ```
 
 After run this code, the trained models saved at ``./experiments/{train_data_type}/{model_name}``.
@@ -93,7 +117,7 @@ After run this code, the trained models saved at ``./experiments/{train_data_typ
   * extend: norm + additional information(e.g. family history, background, underlying disease, ...)
   * kb_extend: extend + knowledge graph 
 * `class_weights`: Using class weights when training the kb_extend data. (Default: False)
-* `model_name`: Set the type of model to train. It supports "ML", "MLP", "Res", "GraphV1" and "GraphV2"
+* `model_name`: Set the type of model to train. It supports "ML", "MLP", "Res", "GraphV1", "GraphV2", "TabNet", and "XBNet"
   - ML
     - LogisticRegression
     - CatBoostClassifier
@@ -114,6 +138,14 @@ After run this code, the trained models saved at ``./experiments/{train_data_typ
   - Graph
     - V1 (Knowledge Search)
     - V2 (Cosine Similarity Search)
+  - Tabular
+    - TabNet ([Github](https://github.com/dreamquark-ai/tabnet) | [Paper](https://ojs.aaai.org/index.php/AAAI/article/view/16826/16633))
+    - XBNet ([Github](https://github.com/tusharsarkar3/XBNet) | [Paper](https://www.sciencedirect.com/science/article/pii/S2667305322000370/pdfft?md5=4466e87faf2a4446bf84bfc8f7ad1b9d&pid=1-s2.0-S2667305322000370-main.pdf))
+* `test_data_type`: Specify the type of train data. It supports "single", "multi", and "unseen"
+  * single: The Single test dataset consists of diseases used in training process. This test dataset aim to measure the typical diagnosic ability of ADS.
+  * multi: The Multi test dataset consists of multiple diseases. This test dataset aim to measure the multiple-diseases diagnostic ability of ADS.
+  * unseen: The Unseen test dataset consists of diseases not used in training process. This test dataset aim to measure the unseen diseases diagnostic ability of ADS. Especially, unseen diseases requires predicting diseases by utilizing the extenal medical knowledge(PolyMed-kg).    
+* `augmentation_strategy`: Specify the data augmentation strategy when training. Supports "SMOTE", "Balance", and "Tomek". (Default: None).
 
 ### Training Guides
 * If want to train with other models instead ML, just change model_name argument to other models. (e.g. --model_name "ML" → --model_name "GraphV2")
@@ -132,17 +164,12 @@ python run_test.py \
 --save_base_path "./experiments" \
 --model_name "ml_tuned" \
 --device 0 \
---seed 42
+--seed 42 \
+--augmentation_strategy "SMOTE"
 ```
 
-### Arguments
-* `test_data_type`: Specify the type of train data. It supports "single", "multi", and "unseen"
-  * single: The Single test dataset consists of diseases used in training process. This test dataset aim to measure the typical diagnosic ability of ADS.
-  * multi: The Multi test dataset consists of multiple diseases. This test dataset aim to measure the multiple-diseases diagnostic ability of ADS.
-  * unseen: The Unseen test dataset consists of diseases not used in training process. This test dataset aim to measure the unseen diseases diagnostic ability of ADS. Especially, unseen diseases requires predicting diseases by utilizing the extenal medical knowledge(PolyMed-kg).
-
 ### Testing Guides
-Just additionally specify the type of test data following the training guides<br>
+Just additionally specify the type and augmentation strategy of the test data and following the training guides.<br>
 - Example1-Machine Learning test for 'norm' dataset:
    * --data_type "norm" --train_data_type "norm" --test_data_type "single" --model_name "ml_tuned"
    * --data_type "norm" --train_data_type "norm" --test_data_type "multi" --model_name "ml_tuned"
@@ -154,6 +181,10 @@ Just additionally specify the type of test data following the training guides<br
    * --data_type "extend" --train_data_type "extend" --test_data_type "single" --model_name "res"
    * --data_type "extend" --train_data_type "extend" --test_data_type "unseen" --model_name "res"
    * --data_type "extend" --train_data_type "extend" --test_data_type "multi" --model_name "res"
+- Example4-xbnet test for 'kb_extend' dataset and 'Tomek' augmentation:
+   * --data_type "extend" --train_data_type "kb_extend" --test_data_type "single" --model_name "xbnet" --augmentation_strategy "Tomek"
+   * --data_type "extend" --train_data_type "kb_extend" --test_data_type "unseen" --model_name "xbnet" --augmentation_strategy "Tomek"
+   * --data_type "extend" --train_data_type "kb_extend" --test_data_type "multi" --model_name "xbnet" --augmentation_strategy "Tomek"
 ***
 ### Installation Issues
 If you encounter a version collision or Not Found Error of specific library during the installation of requirements, follow these steps:<br>

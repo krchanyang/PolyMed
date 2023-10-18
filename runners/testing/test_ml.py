@@ -34,34 +34,34 @@ class MLTestingRunner:
     def test_ml_baseline(self):
         results = defaultdict(list)
 
-        csv_save_name = (
-            f"ml_baseline_{self.train_data_type}_{self.augmentation_strategy}_{self.test_data_type}_result.csv"
-        )
+        csv_save_name = f"ml_baseline_{self.train_data_type}_{self.augmentation_strategy}_{self.test_data_type}_result.csv"
 
         if self.train_data_type == "norm":
-            model_saved_path = NORM_ML_MODEL_SAVE_PATH.format(self.augmentation_strategy)
-            ml_model_paths = sorted(glob(model_saved_path))
-            csv_save_path = os.path.join(
-                model_saved_path.split("*")[0], csv_save_name
+            model_saved_path = NORM_ML_MODEL_SAVE_PATH.format(
+                self.augmentation_strategy
             )
+            ml_model_paths = sorted(glob(model_saved_path))
+            csv_save_path = os.path.join(model_saved_path.split("*")[0], csv_save_name)
         if self.train_data_type == "extend":
-            model_saved_path = EXTEND_ML_MODEL_SAVE_PATH.format(self.augmentation_strategy)
-            ml_model_paths = sorted(glob(model_saved_path))
-            csv_save_path = os.path.join(
-                model_saved_path.split("*")[0], csv_save_name
+            model_saved_path = EXTEND_ML_MODEL_SAVE_PATH.format(
+                self.augmentation_strategy
             )
+            ml_model_paths = sorted(glob(model_saved_path))
+            csv_save_path = os.path.join(model_saved_path.split("*")[0], csv_save_name)
         if self.train_data_type == "kb_extend":
             if self.class_weights:
-                model_saved_path = KB_EXTEND_CLASS_WEIGHTS_ML_MODEL_SAVE_PATH.format(self.augmentation_strategy)
-                ml_model_paths = sorted(
-                    glob(model_saved_path)
+                model_saved_path = KB_EXTEND_CLASS_WEIGHTS_ML_MODEL_SAVE_PATH.format(
+                    self.augmentation_strategy
                 )
+                ml_model_paths = sorted(glob(model_saved_path))
                 csv_save_path = os.path.join(
                     model_saved_path.split("*")[0],
                     csv_save_name,
                 )
             else:
-                model_saved_path = KB_EXTEND_ML_MODEL_SAVE_PATH.format(self.augmentation_strategy)
+                model_saved_path = KB_EXTEND_ML_MODEL_SAVE_PATH.format(
+                    self.augmentation_strategy
+                )
                 ml_model_paths = sorted(glob(model_saved_path))
                 csv_save_path = os.path.join(
                     model_saved_path.split("*")[0], csv_save_name
@@ -127,7 +127,7 @@ class MLTestingRunner:
 
         for path in ml_model_paths:
             print(f"path: {path}")
-            name = path.replace('\\','/').split("/")[-1].split(".pkl")[0].split("_")[0]
+            name = path.replace("\\", "/").split("/")[-1].split(".pkl")[0].split("_")[0]
             print(f"name: {name}")
             model_name = ML_MODEL_DICT[name]
             results["model"].append(model_name)

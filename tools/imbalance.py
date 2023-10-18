@@ -6,6 +6,7 @@ from imblearn.combine import SMOTETomek
 from imblearn.under_sampling import RandomUnderSampler
 from collections import Counter
 
+
 def basic_SMOTE(data_x, data_y):
     train_x = np.array(data_x)
     train_y = np.array(data_y)
@@ -16,7 +17,7 @@ def basic_SMOTE(data_x, data_y):
     max_samples = max(Counter(train_y).values())
 
     # SMOTE Application
-    smote = SMOTE(sampling_strategy='auto', k_neighbors=2)
+    smote = SMOTE(sampling_strategy="auto", k_neighbors=2)
 
     can_smote = [label for label, count in Counter(train_y).items() if count > 1]
     cannot_smote = [label for label, count in Counter(train_y).items() if count == 1]
@@ -47,18 +48,26 @@ def basic_SMOTE(data_x, data_y):
 
     # Before SMOTE
     plt.subplot(1, 2, 1)
-    sns.barplot(x=list(pre_smote_counts.keys()), y=list(pre_smote_counts.values()), color='skyblue')
-    plt.title('Label Distribution Before SMOTE')
-    plt.xlabel('Labels')
-    plt.ylabel('Count')
+    sns.barplot(
+        x=list(pre_smote_counts.keys()),
+        y=list(pre_smote_counts.values()),
+        color="skyblue",
+    )
+    plt.title("Label Distribution Before SMOTE")
+    plt.xlabel("Labels")
+    plt.ylabel("Count")
     plt.xticks(rotation=45)
 
     # After SMOTE
     plt.subplot(1, 2, 2)
-    sns.barplot(x=list(post_smote_counts.keys()), y=list(post_smote_counts.values()), color='salmon')
-    plt.title('Label Distribution After SMOTE')
-    plt.xlabel('Labels')
-    plt.ylabel('Count')
+    sns.barplot(
+        x=list(post_smote_counts.keys()),
+        y=list(post_smote_counts.values()),
+        color="salmon",
+    )
+    plt.title("Label Distribution After SMOTE")
+    plt.xlabel("Labels")
+    plt.ylabel("Count")
     plt.xticks(rotation=45)
 
     plt.tight_layout()
@@ -75,14 +84,26 @@ def balance_SMOTE(data_x, data_y, amplification=4):
 
     # Determine the "balance point" using the median class size.
     can_smote_range = np.where(np.bincount(train_y.astype(int)) > 1)[0]
-    balance_point = int(np.mean(list(Counter(train_y[can_smote_range]).values()))) * amplification
+    balance_point = (
+        int(np.mean(list(Counter(train_y[can_smote_range]).values()))) * amplification
+    )
 
     # Set up our oversampling and undersampling methods
-    smote = SMOTE(sampling_strategy='auto', k_neighbors=2)
-    under_sampler = RandomUnderSampler(sampling_strategy={cls: balance_point for cls, count in Counter(train_y).items() if count > balance_point})
+    smote = SMOTE(sampling_strategy="auto", k_neighbors=2)
+    under_sampler = RandomUnderSampler(
+        sampling_strategy={
+            cls: balance_point
+            for cls, count in Counter(train_y).items()
+            if count > balance_point
+        }
+    )
 
     # First, oversample to the balance point
-    can_smote = [label for label, count in Counter(train_y).items() if count < balance_point and count > 1]
+    can_smote = [
+        label
+        for label, count in Counter(train_y).items()
+        if count < balance_point and count > 1
+    ]
     cannot_smote = [label for label, count in Counter(train_y).items() if count == 1]
 
     X_res, y_res = train_x, train_y
@@ -113,18 +134,26 @@ def balance_SMOTE(data_x, data_y, amplification=4):
 
     # Before SMOTE
     plt.subplot(1, 2, 1)
-    sns.barplot(x=list(pre_smote_counts.keys()), y=list(pre_smote_counts.values()), color='skyblue')
-    plt.title('Label Distribution Before SMOTE')
-    plt.xlabel('Labels')
-    plt.ylabel('Count')
+    sns.barplot(
+        x=list(pre_smote_counts.keys()),
+        y=list(pre_smote_counts.values()),
+        color="skyblue",
+    )
+    plt.title("Label Distribution Before SMOTE")
+    plt.xlabel("Labels")
+    plt.ylabel("Count")
     plt.xticks(rotation=45)
 
     # After SMOTE
     plt.subplot(1, 2, 2)
-    sns.barplot(x=list(post_smote_counts.keys()), y=list(post_smote_counts.values()), color='salmon')
-    plt.title('Label Distribution After SMOTE')
-    plt.xlabel('Labels')
-    plt.ylabel('Count')
+    sns.barplot(
+        x=list(post_smote_counts.keys()),
+        y=list(post_smote_counts.values()),
+        color="salmon",
+    )
+    plt.title("Label Distribution After SMOTE")
+    plt.xlabel("Labels")
+    plt.ylabel("Count")
     plt.xticks(rotation=45)
 
     plt.tight_layout()
@@ -166,7 +195,7 @@ def basic_SMOTE_Tomek(data_x, data_y):
     y_multi_instance = train_y[~mask_single_instance]
 
     # Set up SMOTE-Tomek for combined over-sampling and cleaning
-    smote_tomek = SMOTETomek(sampling_strategy='auto')
+    smote_tomek = SMOTETomek(sampling_strategy="auto")
 
     # Resample the dataset using SMOTE-Tomek
     X_res, y_res = smote_tomek.fit_resample(X_multi_instance, y_multi_instance)
@@ -193,22 +222,29 @@ def basic_SMOTE_Tomek(data_x, data_y):
 
     # Before SMOTE-Tomek
     plt.subplot(1, 2, 1)
-    sns.barplot(x=list(pre_resample_counts.keys()), y=list(pre_resample_counts.values()), color='skyblue')
-    plt.title('Label Distribution Before SMOTE-Tomek')
-    plt.ylabel('Count')
-    plt.xlabel('Labels')
+    sns.barplot(
+        x=list(pre_resample_counts.keys()),
+        y=list(pre_resample_counts.values()),
+        color="skyblue",
+    )
+    plt.title("Label Distribution Before SMOTE-Tomek")
+    plt.ylabel("Count")
+    plt.xlabel("Labels")
     plt.xticks([], [])  # Removing tick labels but keeping x-axis label
 
     # After SMOTE-Tomek
     plt.subplot(1, 2, 2)
     keys = list(post_resample_counts.keys())
     original_counts = [pre_resample_counts.get(key, 0) for key in keys]
-    additional_counts = [post_resample_counts[key] - original_count for key, original_count in zip(keys, original_counts)]
-    sns.barplot(x=keys, y=original_counts, color='skyblue')
-    sns.barplot(x=keys, y=additional_counts, bottom=original_counts, color='salmon')
-    plt.title('Label Distribution After SMOTE-Tomek')
-    plt.ylabel('Count')
-    plt.xlabel('Labels')
+    additional_counts = [
+        post_resample_counts[key] - original_count
+        for key, original_count in zip(keys, original_counts)
+    ]
+    sns.barplot(x=keys, y=original_counts, color="skyblue")
+    sns.barplot(x=keys, y=additional_counts, bottom=original_counts, color="salmon")
+    plt.title("Label Distribution After SMOTE-Tomek")
+    plt.ylabel("Count")
+    plt.xlabel("Labels")
     plt.xticks([], [])  # Removing tick labels but keeping x-axis label
 
     plt.tight_layout()

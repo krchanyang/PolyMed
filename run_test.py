@@ -6,6 +6,7 @@ from runners.testing.test_resnet import MLPResNetTestingRunner
 from runners.testing.test_graph_v1 import GraphV1TestingRunner
 from runners.testing.test_graph_v2 import GraphV2TestingRunner
 from runners.testing.test_tabnet import TabNetTestingRunner
+from runners.testing.test_xbnet import XBNetTestingRunner
 from utils.fix_seed import seed_everything
 import torch
 import os
@@ -62,9 +63,14 @@ def main(args):
         )
         testing_runner.test_resnet()
     if args.model_name.lower() == "tabnet":
-        testing_runner = TabNetTestingRunner(test_x, test_y, word_idx_case, args, device)
+        testing_runner = TabNetTestingRunner(
+            test_x, test_y, word_idx_case, args, device
+        )
         testing_runner.test_tabnet()
-            
+    if args.model_name.lower() == "xbnet":
+        testing_runner = XBNetTestingRunner(test_x, test_y, word_idx_case, args, device)
+        testing_runner.test_xbnet()
+
     if args.model_name.lower() == "graphv1":
         testing_runner = GraphV1TestingRunner(
             test_x,
@@ -154,7 +160,6 @@ if __name__ == "__main__":
         default=[1, 3, 5],
         help="Recall@k and Precision@k list, Default is [1, 3, 5]",
     )
-
     parser.add_argument(
         "--train_data_type", type=str, help='"norm", "extend", "kb_extend"'
     )
@@ -172,10 +177,11 @@ if __name__ == "__main__":
     parser.add_argument("--device", type=int, default=0)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument(
-    "--augmentation_strategy",
-    type=str,
-    help="Train data augmentation strategies. Supports None, SMOTE, Balance, and Tomek. The default is None.",
-    default=None)
+        "--augmentation_strategy",
+        type=str,
+        help="Train data augmentation strategies. Supports None, SMOTE, Balance, and Tomek. The default is None.",
+        default=None,
+    )
 
     args = parser.parse_args()
 

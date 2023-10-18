@@ -63,21 +63,25 @@ class GraphV2TestingRunner:
         dc_input = len(self.test_x[0])
         dc_output = len(self.word_idx_case)
 
-        csv_save_name = (
-            f"graph_v2_{self.train_data_type}_{self.augmentation_strategy}_{self.test_data_type}_result.csv"
-        )
+        csv_save_name = f"graph_v2_{self.train_data_type}_{self.augmenation_strategy}_{self.test_data_type}_result.csv"
 
         if self.train_data_type == "extend":
             model_saved_path = os.path.join(
-                EXTEND_GRAPH_V2_MODEL_SAVE_PATH.format(self.augmenation_strategy), GRAPH_V2_SAVED_MODEL_NAME
-            )
-            csv_save_path = os.path.join(EXTEND_GRAPH_V2_MODEL_SAVE_PATH.format(self.augmenation_strategy), csv_save_name)
-        if self.train_data_type == "kb_extend":
-            model_saved_path = os.path.join(
-                KB_EXTEND_GRAPH_V2_MODEL_SAVE_PATH.format(self.augmenation_strategy), GRAPH_V2_SAVED_MODEL_NAME
+                EXTEND_GRAPH_V2_MODEL_SAVE_PATH.format(self.augmenation_strategy),
+                GRAPH_V2_SAVED_MODEL_NAME,
             )
             csv_save_path = os.path.join(
-                KB_EXTEND_GRAPH_V2_MODEL_SAVE_PATH.format(self.augmenation_strategy), csv_save_name
+                EXTEND_GRAPH_V2_MODEL_SAVE_PATH.format(self.augmenation_strategy),
+                csv_save_name,
+            )
+        if self.train_data_type == "kb_extend":
+            model_saved_path = os.path.join(
+                KB_EXTEND_GRAPH_V2_MODEL_SAVE_PATH.format(self.augmenation_strategy),
+                GRAPH_V2_SAVED_MODEL_NAME,
+            )
+            csv_save_path = os.path.join(
+                KB_EXTEND_GRAPH_V2_MODEL_SAVE_PATH.format(self.augmenation_strategy),
+                csv_save_name,
             )
 
         test_x = torch.tensor(self.test_x).type(torch.FloatTensor).to(self.device)
